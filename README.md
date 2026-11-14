@@ -12,12 +12,13 @@ This is a small, synthetic experiment. No clinician reviewed the cases and nothi
 
 | Folder | What is in it |
 |---|---|
-| `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence) and `prompts.csv` (the 90 prompts). |
+| `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence), `prompts.csv` (the 90 prompts: safe, 2x, 10x), `prompts_dose_finding.csv` (3x, 5x) and `prompts_confirmatory.csv` (2x, 3x, 5x). |
+| `CONFIRMATORY_PLAN.md`, `DEVIATIONS.md` | The pre-registered plan for the dose-finding and confirmatory stages, and the log of deviations and of choices the plan left open. |
 | `data/outputs/` | Results of every experiment, see "Experiments so far". Earlier outputs are kept where they were written. |
 | `src/prompts/` | `prompt_builder.py` and every prompt as a plain text file: responder system prompts, the user template, the confirmation message, the grader prompts. |
 | `src/agents/` | `responder.py` (the assistant under test), `grader_agent.py` (grader v1), `grader_v2.py` (grader v2 and the turn-2 grader). |
-| `src/experiment_hub/` | `hub.py` holds one function per kind of trial: `run()` (single turn), `run_confirm()` (two turns, no tool), `run_tool()` (two turns with the order-entry tool). Each runs one trial and appends one row to a results CSV. `driver.py`, `confirm_pilot.py` and `tool_driver.py` loop over the prompts. |
-| `src/` (scripts) | `regrade_v2.py`, `summarize.py`, `spot_check.py`, `make_figures.py` for the first experiment. `summarize_tool_run.py`, `make_tool_figures.py` for the tool run. |
+| `src/experiment_hub/` | `hub.py` holds one function per kind of trial: `run()` (single turn), `run_confirm()` (two turns, no tool), `run_tool()` (two turns with the order-entry tool). Each runs one trial and appends one row to a results CSV. `driver.py`, `confirm_pilot.py`, `tool_driver.py` and `dose_driver.py` (the confirmatory plan's two stages) loop over the prompts. |
+| `src/` (scripts) | `regrade_v2.py`, `summarize.py`, `spot_check.py`, `make_figures.py` for the first experiment. `summarize_tool_run.py`, `make_tool_figures.py` for the tool run. `summarize_dose_finding.py`, `analyze_confirmatory.py` (with its unit test) and `make_confirmatory_figures.py` for the confirmatory plan. |
 | `order_entry/` | The order-entry tool the responder can call in the tool run (a small MCP server), the deterministic checker that reads its ledger, unit tests, and a README on the design. |
 | `environment/` | How every model call is isolated from the local Claude setup: the one module that builds the `claude` command, a request recorder, and saved evidence. Read `environment/README.md`. |
 
@@ -44,6 +45,16 @@ python3 src/experiment_hub/tool_driver.py --smoke   # 6 conversations -> data/ou
 python3 src/experiment_hub/tool_driver.py        # 270 conversations -> data/outputs/tool_run/
 python3 src/summarize_tool_run.py                # data/outputs/tool_run/summary.md
 python3 src/make_tool_figures.py                 # data/outputs/tool_run/figures/
+
+# Confirmatory plan (CONFIRMATORY_PLAN.md)
+python3 src/prompts/prompt_builder.py prompts_dose_finding.csv 3x 5x      # Stage A inputs
+python3 src/experiment_hub/dose_driver.py A      # Stage A, 180 conversations -> data/outputs/dose_finding/
+python3 src/summarize_dose_finding.py            # summary.md and DOSE_DECISION.md
+python3 src/prompts/prompt_builder.py prompts_confirmatory.csv 2x 3x 5x   # Stage B inputs
+python3 src/experiment_hub/dose_driver.py B      # Stage B, 1,350 conversations (not run yet)
+python3 -m unittest src.test_analyze_confirmatory
+python3 src/analyze_confirmatory.py              # only on complete Stage B data
+python3 src/make_confirmatory_figures.py         # needs matplotlib
 ```
 
 Every model call writes a log with the exact command, the prompts and the full raw output. Each results row carries the paths of its logs, so a reader can go from any row to what was sent and received.
@@ -83,6 +94,18 @@ The responder can call `enter_order` (see `order_entry/README.md`). The tool has
 - Found, after the confirmation: 51 of 90 orders at 2x were entered as written and 0 of 90 at 10x. At 2x by title, out of 15: no title 9, medical student 2, resident 8, attending 12, senior attending 11, department chair 9. At 2x by drug, out of 18: acetaminophen 0, ibuprofen 5, metformin 14, sertraline 15, amlodipine 17.
 - Found, judge check: the panel's "entered as written" answer matched the ledger in 269 of 269 turn-1 replies and 180 of 180 turn-2 replies.
 - Limitations: one model, one fixed confirmation sentence with no rationale, 15 conversations per cell, no statistics. The tool accepts anything, unlike a real system with dose alerts. Replies in this run state plainly whether the order was entered ("I entered the order as ORD-0001"), so the judge check is an easy case and says little about harder text.
+
+### 5. Confirmatory plan, Stage A: dose finding (180 conversations)
+
+`CONFIRMATORY_PLAN.md` pre-registers a fresh-data test of the title effect, with `DEVIATIONS.md` as its log. Stage A is its small exploratory first step: the tool-run conversation at 3x and 5x the label maximum, 3 repeats, ledger outcomes only, no graders.
+
+- Outputs: `data/outputs/dose_finding/` (results.csv, summary.md, DOSE_DECISION.md, logs, ledgers). Inputs: `data/inputs/prompts_dose_finding.csv`.
+- Found: after the confirmation, 28 of 90 orders at 3x and 18 of 90 at 5x were entered as written (2x was 51 of 90 and 10x was 0 of 90 in the tool run). Both pass the plan's rule (between 10% and 90%), so Stage B doses are 2x, 3x and 5x. At 3x and 5x only amlodipine and sertraline orders were entered. Acetaminophen, ibuprofen and metformin were 0 of 18 at both doses.
+- Limitations: 15 conversations per title per dose, exploratory, not used in any test.
+
+### 6. Confirmatory plan, Stage B: not run yet
+
+Stage B (1,350 fresh conversations at 2x, 3x and 5x, then the pre-registered tests) has not been started. Its inputs (`data/inputs/prompts_confirmatory.csv`), driver (`src/experiment_hub/dose_driver.py B`), analysis (`src/analyze_confirmatory.py`, with `src/test_analyze_confirmatory.py`) and figure script (`src/make_confirmatory_figures.py`) are in place. There are no Stage B results.
 
 ## Limitations that apply to everything here
 
