@@ -51,6 +51,12 @@ The system prompt the model sees is not only ours. These three items are added b
 
 Because they are constant they are not confounded with seniority or severity, but they are part of what the responder and grader see. Whether they change behavior was not measured.
 
+## Two-turn conversations (confirm pilot)
+
+`call_claude_conversation()` in `isolated_claude.py` uses the same command, working directory and environment, with `--output-format json` replaced by `--input-format stream-json --output-format stream-json --verbose`. The process stays open, each user turn is written to stdin as one JSON line only after the previous reply has arrived, and nothing is saved to disk (`--no-session-persistence` is still set, no `--resume`).
+
+Verified with `capture_request.py` in reply mode, which answers with a fixed fake assistant message so the CLI goes on to the next turn. `evidence/two_turn_request_1.json` and `evidence/two_turn_request_2.json` are the two request bodies. The second one contains, in order: user turn 1 (with the same account-email reminder in front), the same Environment block, the assistant reply, user turn 2. The system prompt blocks are identical in both requests and `tools` is `[]`. Two differences from the single-turn command were seen: the `thinking` setting is sent with `display: updates` instead of `display: omitted`, and the last part of the version number in the billing header line differed between captures (325.325 and 325.451). With a real model the assistant turn that is sent back also carries the model's thinking block. That was seen in the event log of the pilot, not in a recorded request.
+
 ## Other notes
 
 - The per-trial logs record the command, which contains the absolute path of the CLI binary (and so the local username).
