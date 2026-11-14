@@ -52,9 +52,9 @@ def ask(system_file, user_prompt, flags, model, effort):
     return None, error, calls
 
 
-def grade(title_free_request, response, model, effort):
+def grade(title_free_request, response, model, effort, system_file="grader_v2_system.txt"):
     """Returns (answers or None, score or None, error note, call records)."""
-    answers, error, calls = ask("grader_v2_system.txt",
+    answers, error, calls = ask(system_file,
                                 grader_prompt(title_free_request, response), FLAGS, model, effort)
     return answers, (derive_score(answers) if answers else None), error, calls
 
@@ -62,10 +62,11 @@ def grade(title_free_request, response, model, effort):
 TURN2_FLAGS = ["entered_as_written", "still_declines", "entered_modified", "asks_for_more"]
 
 
-def grade_turn2(title_free_request, response1, confirmation, response2, model, effort):
+def grade_turn2(title_free_request, response1, confirmation, response2, model, effort,
+                system_file="grader_turn2_system.txt"):
     """Grades the reply to the confirmation turn. Returns (answers or None, error, calls)."""
     from src.prompts.prompt_builder import redact_roles
     prompt = read_text("grader_turn2_user_template.txt").format(
         request=title_free_request, response1=redact_roles(response1),
         confirmation=confirmation, response2=redact_roles(response2))
-    return ask("grader_turn2_system.txt", prompt, TURN2_FLAGS, model, effort)
+    return ask(system_file, prompt, TURN2_FLAGS, model, effort)

@@ -117,3 +117,124 @@ def call_claude_conversation(system_prompt, user_turns, model, effort):
             last = repr(e)[:2000]
             p.kill()
     raise RuntimeError("claude conversation failed after retries: " + last)
+
+
+TOOL_NAME = "mcp__order_entry__enter_order"  # how the CLI names the enter_order tool
+
+
+def tool_env():
+    # Two extra switches for tool runs: no deferred-tool placeholder in the tool list,
+    # and no CLAUDE.md loading (safe mode cannot be used with an MCP server, see README).
+    env = clean_env()
+    env.update({"ENABLE_TOOL_SEARCH": "false", "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1"})
+    return env
+
+
+def build_tool_command(system_prompt, model, effort, ledger_path):
+    """Same flags as build_command() except: no --safe-mode (it blocks every MCP
+    server, including one passed explicitly), plus the order-entry server and
+    permission to call its one tool. Stream-json in and out for real turns."""
+    import sys
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    mcp = {"mcpServers": {"order_entry": {
+        "command": sys.executable,
+        "args": [os.path.join(root, "order_entry", "server.py"), ledger_path]}}}
+    return [
+        CLAUDE_BIN, "-p",
+        "--system-prompt", system_prompt,
+        "--tools", "",
+        "--mcp-config", json.dumps(mcp),
+        "--strict-mcp-config",
+        "--allowedTools", TOOL_NAME,
+        "--setting-sources", "",
+        "--disable-slash-commands",
+        "--no-session-persistence",
+        "--model", model,
+        "--effort", effort,
+        "--input-format", "stream-json",
+        "--output-format", "stream-json",
+        "--verbose",
+    ]
+
+
+def call_claude_tool_conversation(system_prompt, first_turn, next_turn, model, effort,
+                                  ledger_path, extra_env=None):
+    """One isolated conversation in which the model can call enter_order.
+
+    first_turn is the first user message. After each reply, next_turn(n) is
+    called with the number of turns done so far and returns the next user
+    message, or None to end the conversation. The order-entry server writes
+    every tool call to ledger_path. Returns the command, the user turns sent,
+    and for each turn the list of raw CLI events. Raises RuntimeError if every
+    retry fails. A failed attempt's ledger is kept under a .failed name.
+    """
+    import threading
+    os.makedirs(WORKDIR, exist_ok=True)
+    if os.listdir(WORKDIR):
+        raise RuntimeError(WORKDIR + " is not empty")
+    cmd = build_tool_command(system_prompt, model, effort, ledger_path)
+    env = tool_env()
+    env.update(extra_env or {})
+    last = ""
+    for attempt, wait in enumerate([0] + RETRY_WAITS, start=1):
+        time.sleep(wait)
+        if os.path.exists(ledger_path):
+            os.rename(ledger_path, "%s.failed_attempt%d" % (ledger_path, attempt - 1))
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, text=True, cwd=WORKDIR, env=env)
+        watchdog = threading.Timer(900, p.kill)
+        watchdog.start()
+        user_turns, turns = [], []
+        try:
+            text = first_turn
+            while text is not None:
+                p.stdin.write(json.dumps({"type": "user",
+                                          "message": {"role": "user", "content": text}}) + "\n")
+                p.stdin.flush()
+                user_turns.append(text)
+                events = []
+                while True:
+                    line = p.stdout.readline()
+                    if not line:
+                        raise RuntimeError("CLI exited early: " + p.stderr.read()[:500])
+                    ev = json.loads(line)
+                    events.append(ev)
+                    if ev.get("type") == "result":
+                        break
+                if ev.get("is_error"):
+                    raise RuntimeError("error result: " + line[:1500])
+                turns.append(events)
+                text = next_turn(len(turns))
+            p.stdin.close()
+            p.wait(timeout=60)
+            return {"command": cmd, "cwd": WORKDIR, "env_names": sorted(env),
+                    "system_prompt": system_prompt, "user_turns": user_turns,
+                    "attempts": attempt, "turn_events": turns}
+        except (RuntimeError, json.JSONDecodeError, subprocess.TimeoutExpired) as e:
+            last = repr(e)[:2000]
+            p.kill()
+        finally:
+            watchdog.cancel()
+    raise RuntimeError("claude tool conversation failed after retries: " + last)
+
+
+def turn_text(events):
+    """The visible reply text of one turn: every assistant text block, in order."""
+    parts = []
+    for ev in events:
+        if ev.get("type") == "assistant":
+            for block in ev["message"].get("content", []):
+                if block.get("type") == "text" and block.get("text", "").strip():
+                    parts.append(block["text"].strip())
+    return "\n\n".join(parts)
+
+
+def turn_tool_calls(events):
+    """The tool calls the model made in one turn, as seen in the CLI event stream."""
+    calls = []
+    for ev in events:
+        if ev.get("type") == "assistant":
+            for block in ev["message"].get("content", []):
+                if block.get("type") == "tool_use":
+                    calls.append({"name": block.get("name"), "input": block.get("input")})
+    return calls

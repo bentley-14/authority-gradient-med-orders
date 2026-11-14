@@ -57,6 +57,37 @@ Because they are constant they are not confounded with seniority or severity, bu
 
 Verified with `capture_request.py` in reply mode, which answers with a fixed fake assistant message so the CLI goes on to the next turn. `evidence/two_turn_request_1.json` and `evidence/two_turn_request_2.json` are the two request bodies. The second one contains, in order: user turn 1 (with the same account-email reminder in front), the same Environment block, the assistant reply, user turn 2. The system prompt blocks are identical in both requests and `tools` is `[]`. Two differences from the single-turn command were seen: the `thinking` setting is sent with `display: updates` instead of `display: omitted`, and the last part of the version number in the billing header line differed between captures (325.325 and 325.451). With a real model the assistant turn that is sent back also carries the model's thinking block. That was seen in the event log of the pilot, not in a recorded request.
 
+## Tool run: the same isolation with one MCP tool
+
+`--safe-mode` cannot be used with the order-entry tool. Tested with the request recorder: with `--safe-mode`, a server passed explicitly through `--mcp-config` is not started and the request has an empty tool list. So the tool run drops `--safe-mode` and relies on the other switches. The command (`build_tool_command()` in `isolated_claude.py`), again with cwd `/private/tmp/w`:
+
+```
+env -i HOME=$HOME USER=$USER PATH=/usr/bin:/bin \
+  ENABLE_TOOL_SEARCH=false CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 \
+  ~/.local/bin/claude -p \
+  --system-prompt "<responder system prompt for the tool run>" \
+  --tools "" \
+  --mcp-config '{"mcpServers":{"order_entry":{"command":"<python3>","args":["<repo>/order_entry/server.py","<ledger path>"]}}}' \
+  --strict-mcp-config \
+  --allowedTools mcp__order_entry__enter_order \
+  --setting-sources "" \
+  --disable-slash-commands \
+  --no-session-persistence \
+  --model sonnet --effort medium \
+  --input-format stream-json --output-format stream-json --verbose
+```
+
+What keeps the local setup out without safe mode: `--setting-sources ""` loads no user, project or local settings (so none of their hooks, plugins or MCP servers), `--strict-mcp-config` allows only the server named on the command line, `--tools ""` removes every built-in tool, `--disable-slash-commands` removes skills and commands, and `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` switches off CLAUDE.md loading. `ENABLE_TOOL_SEARCH=false` is there because without it the CLI adds a second entry to the tool list, a placeholder named `DeferredToolPlaceholder`.
+
+Evidence:
+
+- `evidence/tool_two_turn_request_1.json` and `_2.json`: the two request bodies of a two-turn conversation run through `call_claude_tool_conversation()` against the recorder. In both, the only tool is `mcp__order_entry__enter_order` with the description and fields from `order_entry/server.py`. The system blocks and the three constant injections are the same as in the earlier runs. The strings "Karpathy", "CLAUDE.md", "skill", "memory", "plugin", "hook", "deferred", the username and the repo name do not occur, and there is no em-dash or en-dash. The second request contains user turn 1, the Environment block, the assistant reply, user turn 2.
+- `evidence/tool_probe_response_sonnet.json`: the CLI's own start-up event and the model's self-report from a real call. The start-up event lists `tools: ["mcp__order_entry__enter_order"]`, one MCP server (`order_entry`), no skills and no slash commands. The plugins and agents it lists are the CLI's built-in ones. The model reports one tool, no skills, no memory, no files, no rule about dashes and no mention of Karpathy.
+- In that self-report the model also describes two generic tool-use instructions (make independent tool calls together, and a note about deferred tools). These are not in the request body the CLI sends, so they are added on the API side when a tool list is present. They are the same in every tool-run conversation.
+- The start-up event names an auto-memory path under `~/.claude/projects/` for the working directory. No such directory was created by these runs (checked), and the model has no file tools.
+
+The graders in the tool run use the original safe-mode command with no tools.
+
 ## Other notes
 
 - The per-trial logs record the command, which contains the absolute path of the CLI binary (and so the local username).
