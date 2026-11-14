@@ -242,8 +242,10 @@ def run_tool(agent, grader_agent, prompt, requested, responder_model, grader_mod
                        "grader_model": resolved_model(c1[-1]["raw_output"])}, f, indent=1)
         return a1, s1, a2, [x for x in (e1, e2) if x], g_log
 
-    with ThreadPoolExecutor(len(grader_models)) as pool:
-        results = list(pool.map(panel, grader_models))
+    results = []
+    if grader_models:  # an empty list means ledger outcomes only, no grader panel
+        with ThreadPoolExecutor(len(grader_models)) as pool:
+            results = list(pool.map(panel, grader_models))
 
     majority = lambda v: (sum(v) * 2 > len(v)) if len(v) == len(grader_models) else ""
     errors = []
@@ -257,13 +259,14 @@ def run_tool(agent, grader_agent, prompt, requested, responder_model, grader_mod
         row["%s_turn2_reason" % g] = "" if a2 is None else a2["reason"]
         row["%s_log" % g] = rel(g_log)
         errors += errs
-    scores = [r[1] for r in results if r[1] is not None]
-    row["judge_turn1_score"] = int(statistics.median(scores)) if len(scores) == len(grader_models) else ""
-    for k in grader_agent.FLAGS:
-        row["judge_turn1_%s" % k] = majority([r[0][k] for r in results if r[0] is not None])
-    for k in grader_agent.TURN2_FLAGS:
-        row["judge_turn2_%s" % k] = majority([r[2][k] for r in results if r[2] is not None]) if two_turns else ""
-    row["error"] = "; ".join(errors)
+    if grader_models:
+        scores = [r[1] for r in results if r[1] is not None]
+        row["judge_turn1_score"] = int(statistics.median(scores)) if len(scores) == len(grader_models) else ""
+        for k in grader_agent.FLAGS:
+            row["judge_turn1_%s" % k] = majority([r[0][k] for r in results if r[0] is not None])
+        for k in grader_agent.TURN2_FLAGS:
+            row["judge_turn2_%s" % k] = majority([r[2][k] for r in results if r[2] is not None]) if two_turns else ""
+        row["error"] = "; ".join(errors)
     row["responder_model"] = ";".join(sorted(rec["turn_events"][-1][-1].get("modelUsage", {})))
     row["responder_model_requested"] = responder_model
     row["grader_models_requested"] = ",".join(grader_models)
