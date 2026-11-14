@@ -51,7 +51,7 @@ python3 src/prompts/prompt_builder.py prompts_dose_finding.csv 3x 5x      # Stag
 python3 src/experiment_hub/dose_driver.py A      # Stage A, 180 conversations -> data/outputs/dose_finding/
 python3 src/summarize_dose_finding.py            # summary.md and DOSE_DECISION.md
 python3 src/prompts/prompt_builder.py prompts_confirmatory.csv 2x 3x 5x   # Stage B inputs
-python3 src/experiment_hub/dose_driver.py B      # Stage B, 1,350 conversations (not run yet)
+python3 src/experiment_hub/dose_driver.py B      # Stage B, 1,350 conversations (optional second argument: conversations per pass)
 python3 -m unittest src.test_analyze_confirmatory
 python3 src/analyze_confirmatory.py              # only on complete Stage B data
 python3 src/make_confirmatory_figures.py         # needs matplotlib
@@ -103,9 +103,13 @@ The responder can call `enter_order` (see `order_entry/README.md`). The tool has
 - Found: after the confirmation, 28 of 90 orders at 3x and 18 of 90 at 5x were entered as written (2x was 51 of 90 and 10x was 0 of 90 in the tool run). Both pass the plan's rule (between 10% and 90%), so Stage B doses are 2x, 3x and 5x. At 3x and 5x only amlodipine and sertraline orders were entered. Acetaminophen, ibuprofen and metformin were 0 of 18 at both doses.
 - Limitations: 15 conversations per title per dose, exploratory, not used in any test.
 
-### 6. Confirmatory plan, Stage B: not run yet
+### 6. Confirmatory plan, Stage B: the pre-registered test (1,350 conversations)
 
-Stage B (1,350 fresh conversations at 2x, 3x and 5x, then the pre-registered tests) has not been started. Its inputs (`data/inputs/prompts_confirmatory.csv`), driver (`src/experiment_hub/dose_driver.py B`), analysis (`src/analyze_confirmatory.py`, with `src/test_analyze_confirmatory.py`) and figure script (`src/make_confirmatory_figures.py`) are in place. There are no Stage B results.
+Fresh conversations at 2x, 3x and 5x, 75 per title per dose, run in five passes of 270 because of an account usage cap. Ledger outcomes only, no graders. 1,350 of 1,350 completed, none failed.
+
+- Outputs: `data/outputs/confirmatory/` (results.csv, analysis.md, figures, logs, ledgers). Inputs: `data/inputs/prompts_confirmatory.csv`.
+- Found (primary tests, Cochran-Mantel-Haenszel stratified by drug and dose, Holm-corrected): H1, medical student against no title, 19 of 225 (8%) against 82 of 225 (36%) entered, p < 0.0001. H2, attending, senior attending and chair pooled against no title, 296 of 675 (44%) against 82 of 225 (36%), odds ratio 4.32 (95% CI 2.03 to 9.17), p = 0.0001. No order was entered at the first request (0 of 1,350) and none at a changed dose.
+- Limitations: at 3x and 5x most drug strata are at 0% or 100% and drop out of the tests, so the title comparisons rest on 8 of 15 strata. The H1 odds ratio is 0 with no interval because medical student orders were entered only where every untitled order was also entered. In 2 of 1,350 conversations the model wrote the account email (from the constant CLI reminder) into the order note. It is redacted in the committed files. See `DEVIATIONS.md` for the batching and one interim look at dose and drug totals.
 
 ## Limitations that apply to everything here
 
