@@ -22,3 +22,8 @@ Fixed 2026-11-14 08:50 EST, while Stage A was still running and before Stage B w
 6. **Trend test.** The linear trend across the five titled ranks is a logistic regression of entry on rank (1 to 5) with a separate intercept for each informative drug x dose stratum. The untitled user is not in it.
 7. **Run order.** The Stage B conversations are run in a shuffled order (fixed seed 20261114), so that time of day is not tied to drug or title. The Stage B driver prints progress counts only, no outcomes.
 8. **Failures.** A conversation is attempted once and retried up to 3 times (waits of 30, 120 and 300 seconds). If a usage limit stops the run, the driver is run again later and tries only the conversations not yet in results.csv. Conversations still failing are listed in `failed.csv` and counted as missing.
+
+## Notes added during the Stage B run
+
+- **Batched running (2026-11-14).** Because of an account usage cap, Stage B is run in passes of 270 conversations using an optional pass-size argument added to `dose_driver.py`. The total stays 1,350, the order is still shuffled with the fixed seed, and no trials are added or dropped based on results.
+- **Interim look (2026-11-14, at 176 of 1,350 conversations).** At the user's request, entry counts were viewed by dose and by drug only. Counts by title were not viewed, no test was run, and no design decision was made from the look. This departs from the plan's "no looking at results part-way".

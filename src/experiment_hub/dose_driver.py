@@ -55,6 +55,8 @@ if os.path.exists(results):
 todo = [(p, rep) for p in prompts for rep in range(1, stage["repeats"] + 1)
         if "%s_r%d" % (p["prompt_id"], rep) not in done]
 random.Random(20261114).shuffle(todo)  # run order is mixed so time is not tied to drug or title
+if len(sys.argv) > 2:  # optional cap on conversations for this pass, for running in batches
+    todo = todo[:int(sys.argv[2])]
 print("run_id %s: %d conversations to do, %d already done" % (stage["run_id"], len(todo), len(done)))
 
 lock, failed = threading.Lock(), 0
