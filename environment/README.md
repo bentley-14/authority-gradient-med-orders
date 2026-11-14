@@ -1,0 +1,57 @@
+# environment
+
+Everything that defines how the two agents (responder and grader) are run.
+
+- `isolated_claude.py`: the only code that calls the `claude` CLI. Both agents use it.
+- `capture_request.py`: a local recorder used once to see the exact request the CLI builds.
+- `evidence/`: saved results of the isolation checks.
+
+## The exact command
+
+Run with the working directory set to `/private/tmp/w` (an empty directory outside any git repo, created if missing) and with the user prompt on stdin:
+
+```
+env -i HOME=$HOME USER=$USER PATH=/usr/bin:/bin \
+  ~/.local/bin/claude -p \
+  --safe-mode \
+  --system-prompt "<our system prompt text>" \
+  --tools "" \
+  --strict-mcp-config \
+  --setting-sources "" \
+  --disable-slash-commands \
+  --no-session-persistence \
+  --model <sonnet for responder, opus for grader> \
+  --effort medium \
+  --output-format json
+```
+
+CLI version 2.1.325, logged in through the subscription (no API key). `--bare` is not used because it needs an API key.
+
+## What is isolated
+
+- No CLAUDE.md (global or project), no skills, no plugins, no hooks, no MCP servers, no custom agents (`--safe-mode`, `--strict-mcp-config`, `--setting-sources ""`, `--disable-slash-commands`).
+- No tools (`--tools ""`): the request carries an empty tool list.
+- No memory directory and no project files: the working directory is empty and is not the repo.
+- No inherited environment variables: `env -i` passes only HOME, USER and PATH. The parent shell had about 34 CLAUDE_* and ANTHROPIC_* variables set, including CLAUDE_EFFORT.
+- No saved session (`--no-session-persistence`), so trials cannot see each other.
+- Effort is passed explicitly and shows up in the request as `output_config.effort = medium`.
+
+## How it was verified
+
+1. Exact request body. The CLI was pointed at `capture_request.py` on 127.0.0.1 through ANTHROPIC_BASE_URL. The recorder stores the JSON body only (never headers), forwards nothing, and answers with an error. The body is saved in `evidence/captured_request_body_probe.json` (the `metadata` field dropped, the email redacted). In that body: the strings "Karpathy", "CLAUDE.md", "skill", "MEMORY" and "mcp__" do not occur, the em-dash and en-dash characters do not occur, the username and the repo name do not occur, `tools` is `[]`, the working directory shown is `/private/tmp/w` and "Is a git repository" is false.
+2. Self-report. The same isolated command was run for real with a probe prompt asking the model to list everything it was given, once with sonnet and once with opus. Saved in `evidence/probe_response_sonnet.json` and `evidence/probe_response_opus.json`. Both report no tools, skills, MCP servers, memory or files, no rule about dashes, and no mention of Karpathy.
+
+## Known limitation: three things the CLI always injects
+
+The system prompt the model sees is not only ours. These three items are added by the CLI itself, could not be switched off under subscription login, and are the same in every trial:
+
+1. Two extra system prompt blocks before ours: a billing header line (`x-anthropic-billing-header: cc_version=2.1.325.325; cc_entrypoint=sdk-cli;`) and the line `You are a Claude agent, built on Anthropic's Claude Agent SDK.`
+2. A system-reminder placed in front of the user message that gives the email address of the logged-in account and says to keep it private.
+3. An "Environment" block placed after the user message: working directory (`/private/tmp/w`), not a git repo, platform, shell, OS version, a paragraph about treating downloaded files as untrusted, the model name and ID, the knowledge cutoff, and today's date.
+
+Because they are constant they are not confounded with seniority or severity, but they are part of what the responder and grader see. Whether they change behavior was not measured.
+
+## Other notes
+
+- The per-trial logs record the command, which contains the absolute path of the CLI binary (and so the local username).
+- The email address is redacted as `[REDACTED_EMAIL]` in everything saved here.
