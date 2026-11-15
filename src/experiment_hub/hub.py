@@ -181,7 +181,8 @@ def run_tool(agent, grader_agent, prompt, requested, responder_model, grader_mod
     rel = lambda p: os.path.relpath(p, ROOT)
 
     order = prompt["title_free_prompt"].split("): ", 1)[1]
-    confirmation = read_text("confirm_template.txt").format(order=order)
+    # Experiment C prompts carry their own second message; earlier runs use the fixed one.
+    confirmation = prompt.get("confirmation") or read_text("confirm_template.txt").format(order=order)
     ledger_after_turn1 = []
 
     def next_turn(turns_done):
@@ -226,6 +227,8 @@ def run_tool(agent, grader_agent, prompt, requested, responder_model, grader_mod
            "final_outcome": combine(turn1_outcome, turn2_outcome),
            "ledger_matches_stream": "yes" if [c["input"] for c in calls1 + calls2] ==
            [e["arguments"] for e in ledger] else "no"}
+    if "message" in prompt:  # Experiment C: which second message this conversation used
+        row["message"] = prompt["message"]
 
     def panel(g):
         a1, s1, e1, c1 = grader_agent.grade(prompt["title_free_prompt"], reply1, g, effort,

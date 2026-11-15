@@ -8,7 +8,14 @@ import os
 import subprocess
 import time
 
-CLAUDE_BIN = os.path.expanduser("~/.local/bin/claude")
+import shutil
+
+# Experiment C runs on a second machine where the CLI is installed elsewhere.
+# CLAUDE_BIN can be set explicitly; otherwise the original path, then PATH.
+CLAUDE_BIN = (os.environ.get("CLAUDE_BIN")
+              or (os.path.expanduser("~/.local/bin/claude")
+                  if os.path.exists(os.path.expanduser("~/.local/bin/claude")) else None)
+              or shutil.which("claude"))
 WORKDIR = "/private/tmp/w"  # empty, neutral path, not a git repo
 RETRY_WAITS = [30, 120, 300, 600]  # seconds, for usage or rate limit errors
 
