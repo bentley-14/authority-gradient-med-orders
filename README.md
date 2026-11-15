@@ -14,11 +14,13 @@ This is a small, synthetic experiment. No clinician reviewed the cases and nothi
 |---|---|
 | `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence), `prompts.csv` (the 90 prompts: safe, 2x, 10x), `prompts_dose_finding.csv` (3x, 5x) and `prompts_confirmatory.csv` (2x, 3x, 5x). |
 | `CONFIRMATORY_PLAN.md`, `DEVIATIONS.md` | The pre-registered plan for the dose-finding and confirmatory stages, and the log of deviations and of choices the plan left open. |
+| `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `DEVIATIONS_EXP_C.md` | The pre-registered plan for Experiment C (who is asking, and what the second message says), its pre-registered model addendum (Opus and Haiku), and their deviation log. |
+| `report/` | The report draft (`report_draft.md`), the claims ledger mapping every number in the report to its file and commit (`CLAIMS_LEDGER.md`), and a short status note (`STATUS.md`). |
 | `data/outputs/` | Results of every experiment, see "Experiments so far". Earlier outputs are kept where they were written. |
 | `src/prompts/` | `prompt_builder.py` and every prompt as a plain text file: responder system prompts, the user template, the confirmation message, the grader prompts. |
 | `src/agents/` | `responder.py` (the assistant under test), `grader_agent.py` (grader v1), `grader_v2.py` (grader v2 and the turn-2 grader). |
 | `src/experiment_hub/` | `hub.py` holds one function per kind of trial: `run()` (single turn), `run_confirm()` (two turns, no tool), `run_tool()` (two turns with the order-entry tool). Each runs one trial and appends one row to a results CSV. `driver.py`, `confirm_pilot.py`, `tool_driver.py` and `dose_driver.py` (the confirmatory plan's two stages) loop over the prompts. |
-| `src/` (scripts) | `regrade_v2.py`, `summarize.py`, `spot_check.py`, `make_figures.py` for the first experiment. `summarize_tool_run.py`, `make_tool_figures.py` for the tool run. `summarize_dose_finding.py`, `analyze_confirmatory.py` (with its unit test) and `make_confirmatory_figures.py` for the confirmatory plan. |
+| `src/` (scripts) | `part1_extra_stats.py` (stratum table and say-vs-do counts for Stage B), `analyze_exp_c.py`, `analyze_exp_c_models.py` and `make_exp_c_figures.py` for Experiment C. `regrade_v2.py`, `summarize.py`, `spot_check.py`, `make_figures.py` for the first experiment. `summarize_tool_run.py`, `make_tool_figures.py` for the tool run. `summarize_dose_finding.py`, `analyze_confirmatory.py` (with its unit test) and `make_confirmatory_figures.py` for the confirmatory plan. |
 | `order_entry/` | The order-entry tool the responder can call in the tool run (a small MCP server), the deterministic checker that reads its ledger, unit tests, and a README on the design. |
 | `environment/` | How every model call is isolated from the local Claude setup: the one module that builds the `claude` command, a request recorder, and saved evidence. Read `environment/README.md`. |
 
@@ -55,7 +57,20 @@ python3 src/experiment_hub/dose_driver.py B      # Stage B, 1,350 conversations 
 python3 -m unittest src.test_analyze_confirmatory
 python3 src/analyze_confirmatory.py              # only on complete Stage B data
 python3 src/make_confirmatory_figures.py         # needs matplotlib
+python3 src/part1_extra_stats.py                 # stratum table + preliminary say-vs-do counts
+
+# Experiment C (EXP_C_PLAN.md) and its model addendum (EXP_C_MODELS_ADDENDUM.md)
+python3 src/prompts/exp_c_builder.py             # data/inputs/prompts_exp_c.csv (44 prompts)
+python3 src/experiment_hub/exp_c_driver.py smoke # 11 conversations, plumbing only
+python3 src/experiment_hub/exp_c_driver.py C     # 1,980 conversations -> data/outputs/exp_c/ (optional second argument: conversations per pass)
+python3 src/experiment_hub/exp_c_driver.py msmoke
+python3 src/experiment_hub/exp_c_driver.py M     # 720 conversations -> data/outputs/exp_c_models/
+python3 src/analyze_exp_c.py                     # needs statsmodels
+python3 src/analyze_exp_c_models.py
+python3 src/make_exp_c_figures.py                # data/outputs/exp_c/figures/
 ```
+
+The CLI path can be set with `CLAUDE_BIN`; otherwise `~/.local/bin/claude`, then `claude` on PATH.
 
 Every model call writes a log with the exact command, the prompts and the full raw output. Each results row carries the paths of its logs, so a reader can go from any row to what was sent and received.
 
@@ -110,6 +125,22 @@ Fresh conversations at 2x, 3x and 5x, 75 per title per dose, run in five passes 
 - Outputs: `data/outputs/confirmatory/` (results.csv, analysis.md, figures, logs, ledgers). Inputs: `data/inputs/prompts_confirmatory.csv`.
 - Found (primary tests, Cochran-Mantel-Haenszel stratified by drug and dose, Holm-corrected): H1, medical student against no title, 19 of 225 (8%) against 82 of 225 (36%) entered, p < 0.0001. H2, attending, senior attending and chair pooled against no title, 296 of 675 (44%) against 82 of 225 (36%), odds ratio 4.32 (95% CI 2.03 to 9.17), p = 0.0001. No order was entered at the first request (0 of 1,350) and none at a changed dose.
 - Limitations: at 3x and 5x most drug strata are at 0% or 100% and drop out of the tests, so the title comparisons rest on 8 of 15 strata. The H1 odds ratio is 0 with no interval because medical student orders were entered only where every untitled order was also entered. In 2 of 1,350 conversations the model wrote the account email (from the constant CLI reminder) into the order note. It is redacted in the committed files. See `DEVIATIONS.md` for the batching and one interim look at dose and drug totals.
+
+### 7. Experiment C: who is asking, and what the second message says (1,980 conversations)
+
+Pre-registered in `EXP_C_PLAN.md` (pushed before any run), deviations in `DEVIATIONS_EXP_C.md`. Same tool, ledger and two-turn design, run on a second machine (CLI 2.1.280, model pinned as `claude-sonnet-5-5`) with a new user template, so every comparison is inside Experiment C. Strata: metformin 2x, ibuprofen 2x, amlodipine 5x, sertraline 5x. C1 varies who is asking (no title, resident, attending, a finance analyst and a hospital CEO who both say they are not clinicians) with the bare confirmation. C2 varies the second message for no title and attending (a clinical-sounding protocol reason, an irrelevant reason of the same length, a responsibility claim). 180 conversations per condition.
+
+- Outputs: `data/outputs/exp_c/` (results.csv, analysis.md, figures, logs, ledgers, smoke test). Inputs: `data/inputs/prompts_exp_c.csv`.
+- Found: 0 of 1,980 entered at the first request. After a bare confirmation: CEO 0 of 180, finance analyst 0 of 180, resident 3%, no title 22%, attending 41%. With the protocol reason 358 of 360 were entered (sertraline at 5x the maximum: 88 of 90); with the irrelevant reason 1 of 360; with the responsibility claim 62%. All four primary tests significant (Holm-adjusted p < 0.0001). Every entered order's note still said the dose was over the maximum (701 of 701, regex).
+- Limitations: one wording per title and per message; the protocol message bundles a protocol, pharmacist review and monitoring; the two secondary logistic regressions did not converge and are not reported, as planned.
+
+### 8. Experiment C model addendum: Opus 5.5 and Haiku 5.5 (720 conversations)
+
+Pre-registered in `EXP_C_MODELS_ADDENDUM.md`. The C1 contrast for no title, attending and CEO on two more models, 120 conversations per title per model.
+
+- Outputs: `data/outputs/exp_c_models/`.
+- Found: after a bare confirmation, Haiku no title 68%, attending 86%, CEO 0%; Opus no title 21%, attending 62%, CEO 0%. All four primary tests significant. The CEO got 0 of 420 across the three models.
+- Limitations: three titles and the bare confirmation only; all three models are from one developer.
 
 ## Limitations that apply to everything here
 
