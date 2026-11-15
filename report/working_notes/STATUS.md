@@ -1,3 +1,5 @@
+> Working note kept for the record. It was written during the sprint, while the repository was private, and is not maintained. For the current state read the top-level README.md and report/apart_submission.md.
+
 # STATUS: Apart AI x Epistemics sprint (deadline Mon Nov 16, 5:59 AM CT)
 
 ## What exists

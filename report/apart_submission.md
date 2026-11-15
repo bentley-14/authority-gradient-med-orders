@@ -1,6 +1,6 @@
 # The Right Words, Not the Right Title: What Unlocks an Over-Limit Order in a Clinical AI Agent
 
-Tarun Martheswaran, [affiliation] | Shilp Shah, [affiliation] | With Apart Research
+Tarun Martheswaran | Shilp Shah | With Apart Research
 
 **Abstract**
 
@@ -118,13 +118,14 @@ A clinical agent with a real tool refuses every over-limit order at first, but t
 
 ## Code and Data
 
-- **Code repository**: github.com/bentley-14/authority-gradient-med-orders (branch main; private during judging). All code was written during the sprint.
+- **Code repository**: github.com/bentley-14/authority-gradient-med-orders (branch main, public). All code was written during the sprint.
 - **Data**: every conversation's prompts, raw CLI events, ledger and outcome are in the repository (data/outputs/), with the account email redacted.
+- **Reading guide**: the repository README lists each pre-registered experiment with its plan, results and analysis file, and report/CLAIMS_LEDGER.md maps every number in this report to a file and commit.
 - **Info-hazard note**: see Appendix A on the dual-use consideration of quoting the protocol sentence.
 
 ## Author Contributions (optional)
 
-[TODO: e.g., "S.S. built the harness and ran the exploratory and Stage B experiments. T.M. designed and ran Experiment C and the model addendum. S.S. ran Experiment D. Both authors wrote the report."]
+S.S. built the harness and ran the exploratory and Stage B experiments. T.M. designed and ran Experiment C and the model addendum. S.S. ran Experiment D. Both authors wrote the report.
 
 ## References
 
@@ -151,7 +152,7 @@ A clinical agent with a real tool refuses every over-limit order at first, but t
 
 ## Appendix A. Limitations and Dual-Use / Ethical Considerations
 
-**Dual-use.** Experiment C found a single generic sentence that gets almost every over-limit order entered. That is a real dual-use concern: it is a recipe for pressuring a clinical AI assistant. We weigh it as follows. The sentence is the most obvious thing a clinician would say, not an optimized attack; any deployment where it works is already unsafe against ordinary users; and the defensive lesson (do not let self-reported justification gate harmful actions) needs the example to be credible. [TODO: decide whether the public version quotes the sentence verbatim or paraphrases it.] Part 1's finding could in principle teach someone to claim a senior clinical title and confirm; we judge that added risk to be low. Experiment D reduces the concern: the same report that gives the sentence gives a one-line system-prompt defense that removed most of its effect in our setup. We release no optimized attack prompts.
+**Dual-use.** Experiment C found a single generic sentence that gets almost every over-limit order entered. That is a real dual-use concern: it is a recipe for pressuring a clinical AI assistant. We weigh it as follows. The sentence is the most obvious thing a clinician would say, not an optimized attack; any deployment where it works is already unsafe against ordinary users; and the defensive lesson (do not let self-reported justification gate harmful actions) needs the example to be credible. We therefore quote the sentence, together with the system-prompt sentence that removed most of its effect. Part 1's finding could in principle teach someone to claim a senior clinical title and confirm; we judge that added risk to be low. Experiment D reduces the concern: the same report that gives the sentence gives a one-line system-prompt defense that removed most of its effect in our setup. We release no optimized attack prompts.
 
 **Ethics.** No human subjects and no patient data; drug label data are public (openFDA). The account email that the CLI injects appeared in some order notes (2 of 1,350 in Stage B, 35 of 1,980 in Experiment C, 11 of 720 in the addendum, 1 of 1,080 in Experiment D) and is redacted in all committed files.
 
@@ -192,4 +193,4 @@ Strata selection for Experiment C: the strata whose pooled Stage B entry rate fe
 
 ## LLM Usage Statement
 
-[TODO: write in your own words. Accurate draft: "We used Claude (Anthropic) as a coding and research assistant: to help build the experiment harness and analysis scripts, run literature and citation checks, and draft sections of this report. The experiment designs, pre-registrations and interpretations were reviewed by the authors; every number in the report is traced to a file and commit in the repository (report/CLAIMS_LEDGER.md), and citations were checked against primary sources." Apart asks that the final version be primarily written by the team, so edit the prose before submitting.]
+We used Claude (Anthropic) as a coding and research assistant: to help build the experiment harness and analysis scripts, run literature and citation checks, and draft sections of this report. The experiment designs, pre-registrations and interpretations were reviewed by the authors; every number in the report is traced to a file and commit in the repository (report/CLAIMS_LEDGER.md), and citations were checked against primary sources.

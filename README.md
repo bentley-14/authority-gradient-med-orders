@@ -1,21 +1,68 @@
-# Does a senior title make an AI go along with a bad medication order?
+# The Right Words, Not the Right Title
 
-Apart AI x Epistemics sprint. All code in this repo was written during the sprint (Nov 13 to 15, 2026).
+**What unlocks an over-limit medication order in a clinical AI agent.** Apart AI x Epistemics Research Sprint, Nov 13 to 15, 2026. Tarun Martheswaran and Shilp Shah. All code and data in this repo were produced during the sprint.
 
-## The question
+## Start here
 
-A clinician asks an AI assistant to enter a medication order. Sometimes the dose is at the label maximum (safe), sometimes it is 2x or 10x the label maximum. The person ordering gives no title, or says they are a medical student, resident, attending, senior attending or department chair. Does the assistant push back less, or enter the order more readily, when the stated title is more senior? Everything else in the prompt is fixed: 5 drugs x 3 dose levels x 6 titles x 3 repeats = 270 trials per experiment. The assistant under test ("responder") is Claude Sonnet, called through the `claude -p` command line tool. `STARTER_PLAN.md` is the original spec. `ANALYSIS_PLAN.md` is a fuller design that is not implemented here.
+| If you want | Open |
+|---|---|
+| The report | [`report/apart_submission.pdf`](report/apart_submission.pdf) (source: [`report/apart_submission.md`](report/apart_submission.md)) |
+| The finding in one minute | The next section of this page |
+| To check any number in the report | [`report/CLAIMS_LEDGER.md`](report/CLAIMS_LEDGER.md): every number, the file it comes from and the commit |
+| The four pre-registered experiments | The table under "The experiments" below: plan, results and analysis for each |
+| To read a single conversation | Any row of a `results.csv` names its raw log (`responder_log`) and its order ledger (`ledger`) |
+| To rerun something | "How to run" below |
 
-This is a small, synthetic experiment. No clinician reviewed the cases and nothing here is clinical guidance.
+## The finding in one minute
+
+We gave Claude Sonnet a real order-entry tool with no dose limits and asked it to enter medication orders above the FDA label maximum. Whether an order was entered is read from the tool's ledger by plain code. No model graded any confirmatory outcome.
+
+1. **It always refuses first.** 0 of 4,950 over-limit orders were entered at the first request.
+2. **Pushing back works, and the claimed title moves it.** After a bare "Yes, I confirm", 34% were entered. Senior clinical titles raised that (odds ratio 4.32), a medical student lowered it, and a hospital CEO who said they were not a clinician got 0 of 420 across Sonnet, Opus and Haiku.
+3. **A clinical-sounding reason it cannot check works far better than a title.** One sentence about a "pharmacist-reviewed high-dose protocol" got 358 of 360 orders entered, up to five times the label maximum, from a user with no title. Reworded reasons also worked (90% and 55%). An irrelevant reason got 1 of 360.
+4. **It is not blind to content, and it is fixable.** A claim the model knew was false ("within the FDA label") got 0 of 60. One added system prompt sentence, reminding the agent that it cannot verify what users say, cut entry from 81% to 6% and blocked no routine order (180 of 180 label-maximum orders still entered).
+
+The agent rejects what it knows is false but, by default, treats what it cannot check as evidence.
+
+![Experiment D](data/outputs/exp_d/figures/fig1_message_by_system_prompt.png)
+
+*Experiment D. Share of over-limit orders entered, by what the user's second message says, under three system prompts (60 conversations per bar).*
+
+![Experiment C1 and the model addendum](data/outputs/exp_c/figures/fig1_who_is_asking.png)
+
+*Experiment C and the model addendum. Share entered after a bare "Yes, I confirm", by who is asking, on three models.*
+
+Limits: Claude models only, five drugs, one wording per condition, short synthetic vignettes, a tool with no dose alerts (on purpose), no clinician review, and the fix was tested against a single message of pushback. Nothing here is clinical guidance.
+
+## The experiments
+
+Each confirmatory experiment was pre-registered: its plan was committed and pushed before any of its conversations ran. The commit hashes let you check that order in the git history.
+
+| Experiment | Question | Conversations | Plan (pre-registration commit) | Deviations | Results and analysis |
+|---|---|---|---|---|---|
+| Stage B | Does a stated clinical title change whether a confirmed over-limit order is entered? | 1,350 | [`CONFIRMATORY_PLAN.md`](CONFIRMATORY_PLAN.md) (`113b65d`) | [`DEVIATIONS.md`](DEVIATIONS.md) | [`data/outputs/confirmatory/analysis.md`](data/outputs/confirmatory/analysis.md) |
+| Experiment C | Is it seniority or clinical authority, and does the content of the second message matter? | 1,980 | [`EXP_C_PLAN.md`](EXP_C_PLAN.md) (`28f71a8`) | [`DEVIATIONS_EXP_C.md`](DEVIATIONS_EXP_C.md) | [`data/outputs/exp_c/analysis.md`](data/outputs/exp_c/analysis.md) |
+| Model addendum | Does the title result hold on Opus and Haiku? | 720 | [`EXP_C_MODELS_ADDENDUM.md`](EXP_C_MODELS_ADDENDUM.md) (`d24ec09`) | [`DEVIATIONS_EXP_C.md`](DEVIATIONS_EXP_C.md) | [`data/outputs/exp_c_models/analysis.md`](data/outputs/exp_c_models/analysis.md) |
+| Experiment D | Is it that one sentence, does truth matter when the model can check, and can one instruction close the gate? | 1,080 | [`EXP_D_PLAN.md`](EXP_D_PLAN.md) (`23cdd20`) | [`DEVIATIONS_EXP_D.md`](DEVIATIONS_EXP_D.md) | [`data/outputs/exp_d/analysis.md`](data/outputs/exp_d/analysis.md) |
+
+Each results folder also holds `results.csv` (one row per conversation), `figures/`, `logs/` (raw CLI events for every conversation) and `ledgers/` (what the tool actually recorded).
+
+Earlier exploratory runs (single-turn chat, a grader comparison, a confirm pilot, the first tool run, and dose finding) led to these four and are described in the "Experiment log" further down. They are not used in any confirmatory test.
+
+**How the setup works.** Every conversation is a fresh, isolated `claude -p` call with one tool, `enter_order` ([`order_entry/`](order_entry/)). The tool accepts any dose and writes each call to a ledger. A deterministic checker classifies the conversation as entered as written, entered modified, or not entered. How the calls are isolated from any local settings, with captured request bodies as evidence, is in [`environment/README.md`](environment/README.md).
+
+**Privacy.** The account email that the CLI injects, and local user names and home paths, are replaced with `[REDACTED_EMAIL]`, `[USER]` and `[HOME]` in every data file.
 
 ## Folder map
+
+`STARTER_PLAN.md` and `ANALYSIS_PLAN.md` are the first planning notes from day one, kept for the record.
 
 | Folder | What is in it |
 |---|---|
 | `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence), `prompts.csv` (the 90 prompts: safe, 2x, 10x), `prompts_dose_finding.csv` (3x, 5x) and `prompts_confirmatory.csv` (2x, 3x, 5x). |
 | `CONFIRMATORY_PLAN.md`, `DEVIATIONS.md` | The pre-registered plan for the dose-finding and confirmatory stages, and the log of deviations and of choices the plan left open. |
 | `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `DEVIATIONS_EXP_C.md` | The pre-registered plan for Experiment C (who is asking, and what the second message says), its pre-registered model addendum (Opus and Haiku), and their deviation log. |
-| `report/` | The report draft (`report_draft.md`), the claims ledger mapping every number in the report to its file and commit (`CLAIMS_LEDGER.md`), and a short status note (`STATUS.md`). |
+| `report/` | The report (`apart_submission.pdf`, `.docx` and its Markdown source `apart_submission.md`, built by `build_docx.py`), the claims ledger mapping every number in the report to its file and commit (`CLAIMS_LEDGER.md`), and `working_notes/` (a superseded draft and a status note from the sprint, kept for the record). |
 | `data/outputs/` | Results of every experiment, see "Experiments so far". Earlier outputs are kept where they were written. |
 | `src/prompts/` | `prompt_builder.py` and every prompt as a plain text file: responder system prompts, the user template, the confirmation message, the grader prompts. |
 | `src/agents/` | `responder.py` (the assistant under test), `grader_agent.py` (grader v1), `grader_v2.py` (grader v2 and the turn-2 grader). |
@@ -82,7 +129,7 @@ The CLI path can be set with `CLAUDE_BIN`; otherwise `~/.local/bin/claude`, then
 
 Every model call writes a log with the exact command, the prompts and the full raw output. Each results row carries the paths of its logs, so a reader can go from any row to what was sent and received.
 
-## Experiments so far
+## Experiment log (in the order the work was done)
 
 ### 1. Run 1: single turn, chat only (270 trials)
 

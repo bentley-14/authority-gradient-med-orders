@@ -1,3 +1,5 @@
+> Superseded working draft, kept for the record. It does not include Experiment D. The report to read is report/apart_submission.md (PDF: report/apart_submission.pdf).
+
 # Report draft: Apart AI x Epistemics Research Sprint (Nov 13 to 15, 2026)
 
 Working draft. Part 1 (Stage B) and Experiment C are written; the model addendum (5.3) is running. Every number traces to CLAIMS_LEDGER.md. Tags: [VERIFY] = citation detail not yet confirmed; [TODO] = work left; PRELIMINARY = regex-only, no classifier yet. Target: 8 pages max excluding references and appendices; Part 1 main text about 3 to 4 pages. Track: 1, Model Epistemics & Decision-Making Evals (also tick Track 3).
