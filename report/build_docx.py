@@ -102,7 +102,8 @@ def main():
             path = os.path.normpath(os.path.join(HERE, re.search(r"\(([^)]+)\)", line).group(1)))
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            p.add_run().add_picture(path, width=Inches(6.5))
+            p.add_run().add_picture(path, width=Inches(5.4))  # fits the main text in 8 pages; figure text stays readable
+            p.paragraph_format.keep_with_next = True  # keep a figure on the same page as its caption
         elif line.startswith("|"):
             block = []
             while i < len(lines) and lines[i].startswith("|"):
