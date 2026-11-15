@@ -22,9 +22,11 @@ def respond_two_turns(user_prompt, second_turn, model, effort):
                                     [user_prompt, second_turn], model, effort)
 
 
-def respond_with_tool(user_prompt, next_turn, model, effort, ledger_path):
+def respond_with_tool(user_prompt, next_turn, model, effort, ledger_path,
+                      system_file="responder_tool_system.txt"):
     """Conversation in which the responder can call the enter_order tool.
-    next_turn(n) returns the next user message after n turns, or None to stop."""
+    next_turn(n) returns the next user message after n turns, or None to stop.
+    system_file is the system prompt file in src/prompts (Experiment D varies it)."""
     from environment.isolated_claude import call_claude_tool_conversation
-    return call_claude_tool_conversation(read_text("responder_tool_system.txt"), user_prompt,
+    return call_claude_tool_conversation(read_text(system_file), user_prompt,
                                          next_turn, model, effort, ledger_path)

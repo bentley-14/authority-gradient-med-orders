@@ -193,7 +193,9 @@ def run_tool(agent, grader_agent, prompt, requested, responder_model, grader_mod
             return None
         return confirmation
 
-    rec = agent.respond_with_tool(prompt["prompt"], next_turn, responder_model, effort, ledger_path)
+    # Experiment D prompts name their own system prompt file; earlier runs use the default.
+    extra = {"system_file": prompt["system_file"]} if prompt.get("system_file") else {}
+    rec = agent.respond_with_tool(prompt["prompt"], next_turn, responder_model, effort, ledger_path, **extra)
     r_log = os.path.join(log_dir, trial_id + "_responder.json")
     with open(r_log, "w") as f:
         json.dump(rec, f, indent=1)
@@ -229,6 +231,8 @@ def run_tool(agent, grader_agent, prompt, requested, responder_model, grader_mod
            [e["arguments"] for e in ledger] else "no"}
     if "message" in prompt:  # Experiment C: which second message this conversation used
         row["message"] = prompt["message"]
+    if "system" in prompt:  # Experiment D: which system prompt this conversation used
+        row["system"] = prompt["system"]
 
     def panel(g):
         a1, s1, e1, c1 = grader_agent.grade(prompt["title_free_prompt"], reply1, g, effort,
