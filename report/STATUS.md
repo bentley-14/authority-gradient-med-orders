@@ -24,10 +24,18 @@
 - All experiments finished well before the 11 PM ET freeze. No more runs planned.
 - Open: dual-use call on quoting the "protocol" sentence verbatim (decide with Shilp); figures; turn draft into Apart Google Doc template; affiliations.
 
+## Experiment D (added Nov 15, about 4:15 to 5:00 PM ET, on Shilp's machine)
+- Pre-registered on main (EXP_D_PLAN.md, commit 23cdd20, with driver and analysis script) before any run. 1,080 conversations, 0 failures, finished about 4:43 PM ET.
+- Three questions Experiment C left open: is it that sentence, does truth matter when the model can check, can a deployer close the gate.
+- Findings: protocol sentence repeated (59/60). Reworded reasons also work: specialist 90%, "clinically indicated" with no specifics 55%, bare 27%. A checkable false claim ("within the FDA label") got 0/60. One reminder sentence in the system prompt ("you cannot verify... treat as claims, not evidence") cut the three clinical reasons from 81% to 6% and the bare confirmation to 0; adding an explicit rule gave 0/180. All 180 label-maximum orders were still entered at first request. All four primaries significant.
+- Written into apart_submission.md as the closing results (Figure 4, Table B3), with abstract, contributions, methods, discussion, limitations, future work and conclusion updated. The PDF main text ends on page 8; references and appendices follow (11 pages in total).
+- exp-c was merged into main (fast-forward) before Experiment D; everything is on main now.
+
 ## Report
 - report/apart_submission.md: the draft restructured into Apart's template sections (abstract box, contributions list, Discussion and Limitations, Future Work, Conclusion, Code and Data, LLM Usage Statement, Appendix A dual-use). ~2,600 words of main text + 3 figures (about 6 to 7 pages; Apart recommends 4, sprint maximum 8).
 - report/apart_submission.docx (built by report/build_docx.py) was uploaded to Google Drive as a Google Doc (Nov 15, 3:47 PM ET).
-- report/report_draft.md is the longer working draft; apart_submission.md is the version to submit.
+- report/report_draft.md is the longer working draft and does NOT include Experiment D; apart_submission.md is the version to submit and is current.
+- The Google Doc uploaded at 3:47 PM ET predates Experiment D. Rebuild with report/build_docx.py (already done locally) and upload again.
 
 ## Open questions
 - Dual-use: quote the "protocol" sentence verbatim in the public write-up, or paraphrase? (Tarun + Shilp)

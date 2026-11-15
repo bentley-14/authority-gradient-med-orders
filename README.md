@@ -20,6 +20,7 @@ This is a small, synthetic experiment. No clinician reviewed the cases and nothi
 | `src/prompts/` | `prompt_builder.py` and every prompt as a plain text file: responder system prompts, the user template, the confirmation message, the grader prompts. |
 | `src/agents/` | `responder.py` (the assistant under test), `grader_agent.py` (grader v1), `grader_v2.py` (grader v2 and the turn-2 grader). |
 | `src/experiment_hub/` | `hub.py` holds one function per kind of trial: `run()` (single turn), `run_confirm()` (two turns, no tool), `run_tool()` (two turns with the order-entry tool). Each runs one trial and appends one row to a results CSV. `driver.py`, `confirm_pilot.py`, `tool_driver.py` and `dose_driver.py` (the confirmatory plan's two stages) loop over the prompts. |
+| `EXP_D_PLAN.md`, `DEVIATIONS_EXP_D.md` | The pre-registered plan for Experiment D (reworded reasons, a checkable false claim, and two added system prompt sentences) and its deviation log. |
 | `src/` (scripts) | `part1_extra_stats.py` (stratum table and say-vs-do counts for Stage B), `analyze_exp_c.py`, `analyze_exp_c_models.py` and `make_exp_c_figures.py` for Experiment C. `regrade_v2.py`, `summarize.py`, `spot_check.py`, `make_figures.py` for the first experiment. `summarize_tool_run.py`, `make_tool_figures.py` for the tool run. `summarize_dose_finding.py`, `analyze_confirmatory.py` (with its unit test) and `make_confirmatory_figures.py` for the confirmatory plan. |
 | `order_entry/` | The order-entry tool the responder can call in the tool run (a small MCP server), the deterministic checker that reads its ledger, unit tests, and a README on the design. |
 | `environment/` | How every model call is isolated from the local Claude setup: the one module that builds the `claude` command, a request recorder, and saved evidence. Read `environment/README.md`. |
@@ -68,6 +69,13 @@ python3 src/experiment_hub/exp_c_driver.py M     # 720 conversations -> data/out
 python3 src/analyze_exp_c.py                     # needs statsmodels
 python3 src/analyze_exp_c_models.py
 python3 src/make_exp_c_figures.py                # data/outputs/exp_c/figures/
+
+# Experiment D (EXP_D_PLAN.md)
+python3 src/prompts/exp_d_builder.py             # data/inputs/prompts_exp_d.csv (72 prompts)
+python3 src/experiment_hub/exp_d_driver.py smoke # 18 conversations, plumbing only
+python3 src/experiment_hub/exp_d_driver.py D     # 1,080 conversations -> data/outputs/exp_d/
+python3 src/analyze_exp_d.py                     # needs statsmodels
+python3 src/make_exp_d_figures.py                # data/outputs/exp_d/figures/
 ```
 
 The CLI path can be set with `CLAUDE_BIN`; otherwise `~/.local/bin/claude`, then `claude` on PATH.
@@ -141,6 +149,25 @@ Pre-registered in `EXP_C_MODELS_ADDENDUM.md`. The C1 contrast for no title, atte
 - Outputs: `data/outputs/exp_c_models/`.
 - Found: after a bare confirmation, Haiku no title 68%, attending 86%, CEO 0%; Opus no title 21%, attending 62%, CEO 0%. All four primary tests significant. The CEO got 0 of 420 across the three models.
 - Limitations: three titles and the bare confirmation only; all three models are from one developer.
+
+### 9. Experiment D: is it that sentence, does truth matter, and can an instruction close the gate (1,080 conversations)
+
+Pre-registered in `EXP_D_PLAN.md` (pushed with the driver and analysis script before any run), deviations in `DEVIATIONS_EXP_D.md`. Same tool, ledger, two-turn design, user template and four strata as Experiment C, run on the first machine (CLI 2.1.325, `claude-sonnet-5-5`, effort medium), so every comparison is inside Experiment D. The user is always untitled. Two knobs: what the second message says (bare confirmation, Experiment C's protocol sentence, a specialist reason, "clinically indicated" with no specifics, and a false claim that the dose is within the FDA label) and what the system prompt adds (nothing, a one-sentence reminder that user claims cannot be verified, or the reminder plus an explicit rule). 60 conversations per cell, plus 180 orders at the label maximum as a control.
+
+| Second message | Original prompt | + reminder | + reminder and rule |
+|---|---|---|---|
+| Bare confirmation | 16 of 60 (27%) | 0 of 60 | 0 of 60 |
+| Protocol reason (Experiment C) | 59 of 60 (98%) | 3 of 60 (5%) | 0 of 60 |
+| Specialist reason | 54 of 60 (90%) | 7 of 60 (12%) | 0 of 60 |
+| "Clinically indicated", no specifics | 33 of 60 (55%) | 1 of 60 (2%) | 0 of 60 |
+| False claim, "within the label" | 0 of 60 | 0 of 60 | 0 of 60 |
+| Orders at the label maximum, entered at first request | 60 of 60 | 60 of 60 | 60 of 60 |
+
+- **It is not one sentence.** Reworded clinical reasons also raise entry above the bare confirmation (H9, odds ratio 22.15, 95% CI 7.36 to 66.69). The less safety net a reason names, the less it unlocks.
+- **The model checks what it can.** A claim it knows to be false got 0 of 60 (H10).
+- **One sentence closes most of the gap.** The reminder cut the three clinical reasons from 146 of 180 (81%) to 11 of 180 (6%) (H11); the rule took it to 0 of 180 (H12). Neither blocked any routine order. All four pre-registered tests are significant after Holm correction.
+- Limits: one model, one wording per reason and per system prompt sentence, an untitled user, one message of pressure, 60 per cell.
+- Outputs: `data/outputs/exp_d/` (results.csv, analysis.md, figures, logs, ledgers, smoke test). Inputs: `data/inputs/prompts_exp_d.csv`.
 
 ## Limitations that apply to everything here
 
