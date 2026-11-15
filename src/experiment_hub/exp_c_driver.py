@@ -5,6 +5,8 @@ checker only. Resumable.
 Usage:
   python3 src/experiment_hub/exp_c_driver.py smoke        11 conversations, plumbing check only
   python3 src/experiment_hub/exp_c_driver.py C [N]        Experiment C, 45 repeats (optional: at most N this pass)
+  python3 src/experiment_hub/exp_c_driver.py msmoke       model addendum smoke test, 6 conversations
+  python3 src/experiment_hub/exp_c_driver.py M [N]        model addendum (EXP_C_MODELS_ADDENDUM.md), 30 repeats
 
 Run order (fixed seed 20261115): every C1 conversation first, in shuffled
 order, then every C2-only conversation, in shuffled order. The bare-confirmation
@@ -31,7 +33,13 @@ STAGES = {
               "only_stratum": ("metformin", "2x")},
     "C": {"repeats": 45, "out": "data/outputs/exp_c", "run_id": "exp_c_20261115",
           "only_stratum": None},
+    # Model addendum: C1 bare cells for three titles on two more models.
+    "msmoke": {"repeats": 1, "out": "data/outputs/exp_c_models/smoke", "run_id": "exp_c_models_smoke_20261115",
+               "only_stratum": ("metformin", "2x"), "models": ["claude-opus-5-5", "claude-haiku-5-5"]},
+    "M": {"repeats": 30, "out": "data/outputs/exp_c_models", "run_id": "exp_c_models_20261115",
+          "only_stratum": None, "models": ["claude-opus-5-5", "claude-haiku-5-5"]},
 }
+ADDENDUM_TITLES = ("no_title", "attending", "ceo")
 stage = STAGES[sys.argv[1]]
 hub.TOOL_DIR = os.path.join(ROOT, stage["out"])
 isolated_claude.RETRY_WAITS = [30, 120, 300]
@@ -44,6 +52,11 @@ with open(os.path.join(ROOT, "data/inputs/prompts_exp_c.csv")) as f:
     prompts = list(csv.DictReader(f))
 if stage["only_stratum"]:
     prompts = [p for p in prompts if (p["drug"], p["severity"]) == stage["only_stratum"]]
+if "models" in stage:  # one copy of each addendum prompt per model, model name in the id
+    prompts = [dict(p, prompt_id="%s_%s" % (p["prompt_id"], m.replace("claude-", "").replace("-5-5", "")),
+                    model=m, experiment="M")
+               for p in prompts if p["experiment"] == "C1" and p["seniority"] in ADDENDUM_TITLES
+               for m in stage["models"]]
 
 
 def requested(p):
@@ -57,9 +70,9 @@ done = set()
 if os.path.exists(results):
     with open(results) as f:
         done = {r["trial_id"] for r in csv.DictReader(f)}
-rng = random.Random(20261115)
+rng = random.Random(20261116 if "models" in stage else 20261115)
 blocks = []
-for exp in ("C1", "C2"):
+for exp in ("C1", "C2", "M"):
     block = [(p, rep) for p in prompts if p["experiment"] == exp
              for rep in range(1, stage["repeats"] + 1)]
     rng.shuffle(block)
@@ -72,7 +85,7 @@ print("run_id %s: %d conversations to do, %d already done" % (stage["run_id"], l
 lock, failed = threading.Lock(), 0
 os.makedirs(hub.TOOL_DIR, exist_ok=True)
 with ThreadPoolExecutor(6) as pool:
-    futures = {pool.submit(hub.run_tool, responder, grader_v2, p, requested(p), MODEL,
+    futures = {pool.submit(hub.run_tool, responder, grader_v2, p, requested(p), p.get("model", MODEL),
                            grader_models=[], run_id=stage["run_id"], repeat=rep,
                            effort="medium"): (p, rep) for p, rep in todo}
     for n, fut in enumerate(as_completed(futures), start=1):
