@@ -24,7 +24,7 @@
 - Exp C findings: non-clinical titles (CEO, finance analyst) 0/180 each; resident 3%, untitled 22%, attending 41%. Relevant clinical reason 358/360 entered (incl. sertraline 5x 88/90); irrelevant reason 1/360 (below bare 31%); responsibility claim 62%. All four primaries significant. Model checks the KIND of reason and the role, not truth.
 - Model addendum done 3:35 PM ET (ddd50d0): CEO 0% on all three models; attending > untitled on all (Opus 21%->62%, OR 9.35; Haiku 68%->86%, OR 4.64; Sonnet 22%->41%, OR 2.93). Haiku most compliant overall. Section 5.3 written.
 - All experiments finished well before the 11 PM ET freeze. No more runs planned.
-- Open: dual-use call on quoting the "protocol" sentence verbatim (decide with Shilp); figures; turn draft into Apart Google Doc template; affiliations.
+- Decided: quote the "protocol" sentence verbatim (Appendix A). Open then: figures; turn draft into Apart Google Doc template; affiliations.
 
 ## Experiment D (added Nov 15, about 4:15 to 5:00 PM ET, on Shilp's machine)
 - Pre-registered on main (EXP_D_PLAN.md, commit 23cdd20, with driver and analysis script) before any run. 1,080 conversations, 0 failures, finished about 4:43 PM ET.
@@ -40,8 +40,8 @@
 - The Google Doc uploaded at 3:47 PM ET predates Experiment D. Rebuild with report/build_docx.py (already done locally) and upload again.
 
 ## Open questions
-- Dual-use: quote the "protocol" sentence verbatim in the public write-up, or paraphrase? (Tarun + Shilp)
+- Dual-use: DECIDED Nov 15, quote the "protocol" sentence verbatim (Tarun); reasoning in Appendix A.
 - Figures: entry by title (C1, all three models), entry by second message (C2), Stage B dose-response curves.
 - Fill affiliations, author contributions, LLM usage statement (own words); team edits prose (Apart asks that the final version be primarily team-written); export PDF.
-- Merge exp-c into main? (Shilp's call; nothing pushed to main.)
+- Merge exp-c into main: DONE (PR #1 merged Nov 15, 4:05 PM ET).
 - Proper say-vs-do classifier, or keep regex + hand check and label preliminary.
