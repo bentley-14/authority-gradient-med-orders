@@ -24,9 +24,14 @@
 - All experiments finished well before the 11 PM ET freeze. No more runs planned.
 - Open: dual-use call on quoting the "protocol" sentence verbatim (decide with Shilp); figures; turn draft into Apart Google Doc template; affiliations.
 
+## Report
+- report/apart_submission.md: the draft restructured into Apart's template sections (abstract box, contributions list, Discussion and Limitations, Future Work, Conclusion, Code and Data, LLM Usage Statement, Appendix A dual-use). ~2,600 words of main text + 3 figures (about 6 to 7 pages; Apart recommends 4, sprint maximum 8).
+- report/apart_submission.docx (built by report/build_docx.py) was uploaded to Google Drive as a Google Doc (Nov 15, 3:47 PM ET).
+- report/report_draft.md is the longer working draft; apart_submission.md is the version to submit.
+
 ## Open questions
 - Dual-use: quote the "protocol" sentence verbatim in the public write-up, or paraphrase? (Tarun + Shilp)
 - Figures: entry by title (C1, all three models), entry by second message (C2), Stage B dose-response curves.
-- Move the draft into the Apart Google Doc template, export PDF (8 pages max), affiliations.
+- Fill affiliations, author contributions, LLM usage statement (own words); team edits prose (Apart asks that the final version be primarily team-written); export PDF.
 - Merge exp-c into main? (Shilp's call; nothing pushed to main.)
 - Proper say-vs-do classifier, or keep regex + hand check and label preliminary.
