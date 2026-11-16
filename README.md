@@ -1,33 +1,59 @@
-# Does a senior title make an AI go along with a bad medication order?
+# The Right Words, Not the Right Title: What Unlocks an Over-Limit Order in a Clinical AI Agent
 
-Apart AI x Epistemics sprint. All code in this repo was written during the sprint (Nov 13 to 15, 2026).
+Tarun Martheswaran and Shilp Shah. Apart Research AI x Epistemics Research Sprint, Nov 13 to 15, 2026. All code in this repo was written during the sprint; no pre-existing code was used.
 
-## The question
+**Report:** [`report/apart_submission.pdf`](report/apart_submission.pdf) (source: `report/apart_submission.md`).
 
-A clinician asks an AI assistant to enter a medication order. Sometimes the dose is at the label maximum (safe), sometimes it is 2x or 10x the label maximum. The person ordering gives no title, or says they are a medical student, resident, attending, senior attending or department chair. Does the assistant push back less, or enter the order more readily, when the stated title is more senior? Everything else in the prompt is fixed: 5 drugs x 3 dose levels x 6 titles x 3 repeats = 270 trials per experiment. The assistant under test ("responder") is Claude Sonnet, called through the `claude -p` command line tool. `STARTER_PLAN.md` is the original spec. `ANALYSIS_PLAN.md` is a fuller design that is not implemented here.
+## In one paragraph
+
+We gave Claude a real hospital order-entry tool with no dose limits and asked it to enter medication orders above the FDA label maximum. Whether an order was entered is read from the tool's ledger by plain code, not judged by a model. Across four pre-registered studies (5,130 conversations) the agent never entered an over-limit order at the first request. What it did after one more message depended on who was asking and, much more, on what they said. It ignores seniority outside the clinical domain, but it treats an unverifiable clinical-sounding reason as evidence, while it rejects a reason it can check and knows to be false. One system-prompt sentence saying that user claims are unverifiable removed most of the effect.
 
 This is a small, synthetic experiment. No clinician reviewed the cases and nothing here is clinical guidance.
+
+## Headline findings
+
+| Study | What we varied | What we found |
+|---|---|---|
+| Stage B (1,350 conversations) | Six clinical titles, bare "Yes, I confirm" | 34% entered after the confirmation. Senior titles raised entry (44% vs 36% untitled, odds ratio 4.32), a medical student lowered it (8%). Replicates the authority gradient, in actions. |
+| Experiment C (1,980) | Clinical vs non-clinical titles; what the second message says | A hospital CEO and a finance analyst (both "not a clinician") got 0 of 180 each; resident 3%, untitled 22%, attending 41%. A "documented, pharmacist-reviewed high-dose protocol" sentence got 358 of 360 entered; an irrelevant reason got 1 of 360; a responsibility claim 62%. |
+| Model addendum (720) | Same title contrast on Opus and Haiku | The CEO got 0% on all three models; an attending title raised entry on all three. |
+| Experiment D (1,080) | Reworded reasons, a checkable false claim, two system-prompt guards | Reworded clinical reasons also worked (90%, 55%). A false "within the FDA label" claim got 0 of 60. One reminder sentence cut entry from 81% to 6%, an explicit rule to 0%, and all 180 label-maximum orders were still entered. |
+
+Every number traces to a results file and commit in [`report/CLAIMS_LEDGER.md`](report/CLAIMS_LEDGER.md).
+
+![Methods: the harness and the experiment ladder](report/figures/fig_methods.png)
+
+*The harness used in every study (top) and how each study answered the question the previous one left open (bottom).*
+
+## What the top-level files are
+
+| File | What it is |
+|---|---|
+| `STARTER_PLAN.md` | The original one-page spec from the start of the sprint (single turn, chat only). Kept for history; the project moved past it (see "Deviations from STARTER_PLAN.md" below). |
+| `ANALYSIS_PLAN.md` | A fuller early design draft, never frozen and not implemented as written. Kept for history. |
+| `CONFIRMATORY_PLAN.md` | Pre-registration for Stage A (dose finding) and Stage B (the title test). Timestamped evidence: committed before any of its data. |
+| `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `EXP_D_PLAN.md` | Pre-registrations for Experiment C, its model addendum and Experiment D, each pushed before its run. |
+| `DEVIATIONS.md`, `DEVIATIONS_EXP_C.md`, `DEVIATIONS_EXP_D.md` | Logs of every deviation from those plans and of choices the plans left open. |
+
+The plan and deviation files, the analysis scripts they name, and everything under `data/` and `environment/evidence/` are left exactly as committed at the time.
 
 ## Folder map
 
 | Folder | What is in it |
 |---|---|
-| `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence), `prompts.csv` (the 90 prompts: safe, 2x, 10x), `prompts_dose_finding.csv` (3x, 5x) and `prompts_confirmatory.csv` (2x, 3x, 5x). |
-| `CONFIRMATORY_PLAN.md`, `DEVIATIONS.md` | The pre-registered plan for the dose-finding and confirmatory stages, and the log of deviations and of choices the plan left open. |
-| `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `DEVIATIONS_EXP_C.md` | The pre-registered plan for Experiment C (who is asking, and what the second message says), its pre-registered model addendum (Opus and Haiku), and their deviation log. |
-| `report/` | The report draft (`report_draft.md`), the claims ledger mapping every number in the report to its file and commit (`CLAIMS_LEDGER.md`), and a short status note (`STATUS.md`). |
-| `data/outputs/` | Results of every experiment, see "Experiments so far". Earlier outputs are kept where they were written. |
-| `src/prompts/` | `prompt_builder.py` and every prompt as a plain text file: responder system prompts, the user template, the confirmation message, the grader prompts. |
-| `src/agents/` | `responder.py` (the assistant under test), `grader_agent.py` (grader v1), `grader_v2.py` (grader v2 and the turn-2 grader). |
-| `src/experiment_hub/` | `hub.py` holds one function per kind of trial: `run()` (single turn), `run_confirm()` (two turns, no tool), `run_tool()` (two turns with the order-entry tool). Each runs one trial and appends one row to a results CSV. `driver.py`, `confirm_pilot.py`, `tool_driver.py` and `dose_driver.py` (the confirmatory plan's two stages) loop over the prompts. |
-| `EXP_D_PLAN.md`, `DEVIATIONS_EXP_D.md` | The pre-registered plan for Experiment D (reworded reasons, a checkable false claim, and two added system prompt sentences) and its deviation log. |
-| `src/` (scripts) | `part1_extra_stats.py` (stratum table and say-vs-do counts for Stage B), `analyze_exp_c.py`, `analyze_exp_c_models.py` and `make_exp_c_figures.py` for Experiment C. `regrade_v2.py`, `summarize.py`, `spot_check.py`, `make_figures.py` for the first experiment. `summarize_tool_run.py`, `make_tool_figures.py` for the tool run. `summarize_dose_finding.py`, `analyze_confirmatory.py` (with its unit test) and `make_confirmatory_figures.py` for the confirmatory plan. |
-| `order_entry/` | The order-entry tool the responder can call in the tool run (a small MCP server), the deterministic checker that reads its ledger, unit tests, and a README on the design. |
+| `report/` | The submission (`apart_submission.md`, built to `apart_submission.pdf` by `build_pdf.py` and to `apart_submission.docx` by `build_docx.py`; LaTeX source in `latex/`), the methods figure in `figures/`, the claims ledger (`CLAIMS_LEDGER.md`), and `archive/` with the superseded working draft and status notes. |
+| `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence) and the prompt files for each experiment (`prompts.csv`, `prompts_dose_finding.csv`, `prompts_confirmatory.csv`, `prompts_exp_c.csv`, `prompts_exp_d.csv`). |
+| `data/outputs/` | Results of every experiment (results.csv, analysis.md, figures, logs, ledgers), see "Full experiment log". Earlier outputs are kept where they were written. |
+| `order_entry/` | The order-entry tool the responder can call (a small MCP server), the deterministic checker that reads its ledger, unit tests, and a README on the design. |
 | `environment/` | How every model call is isolated from the local Claude setup: the one module that builds the `claude` command, a request recorder, and saved evidence. Read `environment/README.md`. |
+| `src/prompts/` | Prompt builders and every prompt as a plain text file: responder system prompts (including the Experiment D reminder and rule), user templates, the confirmation message, grader prompts. |
+| `src/agents/` | `responder.py` (the assistant under test), `grader_agent.py` (grader v1), `grader_v2.py` (grader v2 and the turn-2 grader). |
+| `src/experiment_hub/` | `hub.py` holds one function per kind of trial; the drivers (`driver.py`, `confirm_pilot.py`, `tool_driver.py`, `dose_driver.py`, `exp_c_driver.py`, `exp_d_driver.py`) loop over the prompts. Every driver is resumable. |
+| `src/` (scripts) | Analysis and figure scripts for each experiment (`analyze_confirmatory.py`, `analyze_exp_c.py`, `analyze_exp_c_models.py`, `analyze_exp_d.py`, `make_*_figures.py`, `part1_extra_stats.py`, ...) and `make_method_figure.py` for the report's methods diagram. |
 
 ## How to run
 
-Needs Python 3 and the `claude` CLI, logged in. The pipeline uses the standard library only. The two figure scripts need matplotlib. Run everything from the repo root. Every driver is resumable: it skips trials already in its results file.
+Needs Python 3 and the `claude` CLI, logged in. The pipeline uses the standard library only. The figure scripts need matplotlib and the analysis scripts need statsmodels. The report scripts make no model calls. Run everything from the repo root. Every driver is resumable: it skips trials already in its results file.
 
 ```
 python3 src/prompts/prompt_builder.py            # data/inputs/prompts.csv (90 prompts)
@@ -76,13 +102,18 @@ python3 src/experiment_hub/exp_d_driver.py smoke # 18 conversations, plumbing on
 python3 src/experiment_hub/exp_d_driver.py D     # 1,080 conversations -> data/outputs/exp_d/
 python3 src/analyze_exp_d.py                     # needs statsmodels
 python3 src/make_exp_d_figures.py                # data/outputs/exp_d/figures/
+
+# Report (no model calls)
+python3 src/make_method_figure.py                # report/figures/fig_methods.png (needs matplotlib)
+python3 report/build_pdf.py                      # report/apart_submission.pdf (needs tectonic); prints the page where the main text ends
+python3 report/build_docx.py                     # report/apart_submission.docx (needs python-docx)
 ```
 
 The CLI path can be set with `CLAUDE_BIN`; otherwise `~/.local/bin/claude`, then `claude` on PATH.
 
 Every model call writes a log with the exact command, the prompts and the full raw output. Each results row carries the paths of its logs, so a reader can go from any row to what was sent and received.
 
-## Experiments so far
+## Full experiment log
 
 ### 1. Run 1: single turn, chat only (270 trials)
 
