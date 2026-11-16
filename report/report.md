@@ -1,6 +1,6 @@
 # The Right Words, Not the Right Title: What Unlocks an Over-Limit Order in a Clinical AI Agent
 
-Tarun Martheswaran | Shilp Shah | With Apart Research
+Tarun Martheswaran | Shilp Shah
 
 **Abstract**
 
@@ -12,7 +12,7 @@ If you tell an AI helper "I'm the boss," should it be more willing to do somethi
 
 Language models are increasingly deployed as clinical assistants with tools that act. Medicine already knows how status can override judgment: juniors defer to seniors even when the senior is wrong, a recognized contributor to medical error called the authority gradient (Cosby & Croskerry, 2004). That raises a concrete question for AI epistemics: when a clinical agent states a belief ("this dose is five times the maximum"), does its action stay tied to that belief, or does it bend to claims about who is asking and why, claims it cannot verify?
 
-Most work on this question scores what a model says. We score what it does. Our agent has an order-entry tool, and whether an order was entered is read from the tool's ledger by plain code. This removes the model judge from the primary outcome and measures the gap between a model's stated assessment and its action ("the gap between what a model implies and what it will defend," in the sprint's Track 1 wording). The study is a ladder: a first experiment tests the prior idea that rank sways decisions, and each later one answers the question the previous one left open.
+Most work on this question scores what a model says. We score what it does. Our agent has an order-entry tool, and whether an order was entered is read from the tool's ledger by plain code. This removes the model judge from the primary outcome and measures the gap between a model's stated assessment and its action. The study is a ladder: a first experiment tests the prior idea that rank sways decisions, and each later one answers the question the previous one left open.
 
 **Our main contributions are:**
 
@@ -132,14 +132,14 @@ This matters for medicine because the cheapest things to fake in a chat window a
 
 ## Code and Data
 
-- **Code repository**: github.com/bentley-14/authority-gradient-med-orders (branch main, public). All code was written during the sprint; no pre-existing code was used.
+- **Code repository**: github.com/bentley-14/authority-gradient-med-orders (branch main, public). All code was written for this project, Nov 13 to 15, 2026.
 - **Data**: every conversation's prompts, raw CLI events, ledger and outcome are in the repository (data/outputs/), with the account email redacted.
 - **Reading guide**: the repository README lists each pre-registered experiment with its plan, results and analysis file, and report/CLAIMS_LEDGER.md maps every number in this report to a file and commit.
 - **Info-hazard note**: see Appendix A on the dual-use consideration of quoting the protocol sentence.
 
-## Author Contributions (optional)
+## Author Contributions
 
-S.S. built the harness and ran the exploratory and Stage B experiments. T.M. designed and ran Experiment C and the model addendum. S.S. ran Experiment D. Both authors wrote the report.
+All authors contributed equally.
 
 ## References
 

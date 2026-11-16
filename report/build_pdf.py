@@ -1,11 +1,10 @@
-"""Builds report/apart_submission.pdf from report/apart_submission.md through LaTeX.
+"""Builds report/report.pdf from report/report.md through LaTeX.
 
 The Markdown is the single source. This script converts the small subset of Markdown the
 report uses (headings, paragraphs with **bold** / *italic* / `code`, numbered and bulleted
 lists, pipe tables, images followed by an italic caption line) into
-report/latex/apart_submission.tex, laid out like the Apart Research submission template
-(Old Standard TT serif, centered title with the sprint footnote, authors, "With Apart
-Research", boxed abstract, numbered sections), then compiles it with tectonic.
+report/latex/report.tex (Old Standard TT serif, centered title, authors, boxed abstract,
+numbered sections), then compiles it with tectonic.
 
 It also prints the page on which the main text ends (the end of the Conclusion; figures
 from the main text are forced out before that point) and the total page count.
@@ -19,11 +18,10 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "apart_submission.md")
+SRC = os.path.join(HERE, "report.md")
 TEXDIR = os.path.join(HERE, "latex")
-TEX = os.path.join(TEXDIR, "apart_submission.tex")
-PDF = os.path.join(HERE, "apart_submission.pdf")
-FOOTNOTE = "Research conducted at the AI x Epistemics Research Sprint, November 2026"
+TEX = os.path.join(TEXDIR, "report.tex")
+PDF = os.path.join(HERE, "report.pdf")
 MAIN_END_BEFORE = "Code and Data"  # first heading after the main text
 
 PREAMBLE = r"""\documentclass[11pt]{article}
@@ -145,14 +143,13 @@ def convert(md):
     authors = [a.strip() for a in lines[2].split("|") if not a.strip().startswith("With")]
     abstract = lines[6].strip()
     out = [PREAMBLE]
-    out.append(r"\begin{center}{\fontsize{20}{24}\selectfont\bfseries %s\footnote{%s}\par}"
-               % (inline(title), esc(FOOTNOTE)))
+    out.append(r"\begin{center}{\fontsize{20}{24}\selectfont\bfseries %s\par}" % inline(title))
     out.append(r"\vspace{10pt}")
     cells = []
     for a in authors:
         name, _, aff = a.partition(",")
         cells.append(r"\begin{tabular}[t]{c}%s\\{}%s\end{tabular}" % (inline(name.strip()), inline(aff.strip())))
-    out.append(r"\hspace{2em}".join(cells) + r"\hspace{2em}\begin{tabular}[t]{c}\textbf{With}\\Apart Research\end{tabular}")
+    out.append(r"\hspace{2em}".join(cells))
     out.append(r"\end{center}")
     out.append(r"\vspace{2pt}\begin{center}{\fontsize{14}{17}\selectfont\bfseries Abstract}\end{center}\vspace{-6pt}")
     out.append(r"\begin{center}\fbox{\begin{minipage}{0.9\textwidth}\vspace{4pt}\small\setlength{\parskip}{0pt}"
@@ -234,15 +231,15 @@ def main():
     with open(TEX, "w") as f:
         f.write(tex)
     # cwd = report/latex so the relative \graphicspath (report/) works and no absolute paths leak
-    subprocess.run([tectonic(), "--keep-intermediates", "--keep-logs", "apart_submission.tex"],
+    subprocess.run([tectonic(), "--keep-intermediates", "--keep-logs", "report.tex"],
                    cwd=TEXDIR, check=True)
-    shutil.move(os.path.join(TEXDIR, "apart_submission.pdf"), PDF)
-    aux = open(os.path.join(TEXDIR, "apart_submission.aux")).read()
+    shutil.move(os.path.join(TEXDIR, "report.pdf"), PDF)
+    aux = open(os.path.join(TEXDIR, "report.aux")).read()
     m = re.search(r"\\newlabel\{endmain\}\{\{[^}]*\}\{(\d+)\}", aux)
-    log = open(os.path.join(TEXDIR, "apart_submission.log")).read()
+    log = open(os.path.join(TEXDIR, "report.log")).read()
     pages = re.search(r"Output written on \S+ \((\d+) pages?", log)
     for ext in ("aux", "log", "out", "xdv"):
-        p = os.path.join(TEXDIR, "apart_submission." + ext)
+        p = os.path.join(TEXDIR, "report." + ext)
         if os.path.exists(p):
             os.remove(p)
     print("wrote", PDF)

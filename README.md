@@ -1,12 +1,12 @@
 # The Right Words, Not the Right Title
 
-**What unlocks an over-limit medication order in a clinical AI agent.** Apart AI x Epistemics Research Sprint, Nov 13 to 15, 2026. Tarun Martheswaran and Shilp Shah. All code and data in this repo were produced during the sprint.
+**What unlocks an over-limit medication order in a clinical AI agent.** Tarun Martheswaran and Shilp Shah, November 2026. All code and data in this repo were produced for this project between Nov 13 and 15, 2026.
 
 ## Start here
 
 | If you want | Open |
 |---|---|
-| The report | [`report/apart_submission.pdf`](report/apart_submission.pdf) (source: [`report/apart_submission.md`](report/apart_submission.md)) |
+| The report | [`report/report.pdf`](report/report.pdf) (source: [`report/report.md`](report/report.md)) |
 | The finding in one minute | The next section of this page |
 | To check any number in the report | [`report/CLAIMS_LEDGER.md`](report/CLAIMS_LEDGER.md): every number, the file it comes from and the commit |
 | The four pre-registered experiments | The table under "The experiments" below: plan, results and analysis for each |
@@ -61,7 +61,7 @@ Earlier exploratory runs (single-turn chat, a grader comparison, a confirm pilot
 
 | File | What it is |
 |---|---|
-| `STARTER_PLAN.md` | The original one-page spec from the start of the sprint (single turn, chat only). Kept for history; the project moved past it (see "Deviations from STARTER_PLAN.md" below). |
+| `STARTER_PLAN.md` | The original one-page spec from the start of the project (single turn, chat only). Kept for history; the project moved past it (see "Deviations from STARTER_PLAN.md" below). |
 | `ANALYSIS_PLAN.md` | A fuller early design draft, never frozen and not implemented as written. Kept for history. |
 | `CONFIRMATORY_PLAN.md` | Pre-registration for Stage A (dose finding) and Stage B (the title test). Timestamped evidence: committed before any of its data. |
 | `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `EXP_D_PLAN.md` | Pre-registrations for Experiment C, its model addendum and Experiment D, each pushed before its run. |
@@ -73,7 +73,7 @@ The plan and deviation files, the analysis scripts they name, and everything und
 
 | Folder | What is in it |
 |---|---|
-| `report/` | The submission (`apart_submission.md`, built to `apart_submission.pdf` by `build_pdf.py` and to `apart_submission.docx` by `build_docx.py`; LaTeX source in `latex/`), the methods figure in `figures/`, the claims ledger (`CLAIMS_LEDGER.md`), and `working_notes/` (a superseded draft and a status note from the sprint, kept for the record). |
+| `report/` | The report (`report.md`, built to `report.pdf` by `build_pdf.py` and to `report.docx` by `build_docx.py`; LaTeX source in `latex/`), the methods figure in `figures/`, and the claims ledger (`CLAIMS_LEDGER.md`). |
 | `data/inputs/` | `drugs.csv` (label maximum daily dose for each drug, the regimen used, the openFDA source URL and the quoted label sentence) and the prompt files for each experiment (`prompts.csv`, `prompts_dose_finding.csv`, `prompts_confirmatory.csv`, `prompts_exp_c.csv`, `prompts_exp_d.csv`). |
 | `data/outputs/` | Results of every experiment (results.csv, analysis.md, figures, logs, ledgers), see "Full experiment log". Earlier outputs are kept where they were written. |
 | `order_entry/` | The order-entry tool the responder can call (a small MCP server), the deterministic checker that reads its ledger, unit tests, and a README on the design. |
@@ -137,8 +137,8 @@ python3 src/make_exp_d_figures.py                # data/outputs/exp_d/figures/
 
 # Report (no model calls)
 python3 src/make_method_figure.py                # report/figures/fig_methods.png (needs matplotlib)
-python3 report/build_pdf.py                      # report/apart_submission.pdf (needs tectonic); prints the page where the main text ends
-python3 report/build_docx.py                     # report/apart_submission.docx (needs python-docx)
+python3 report/build_pdf.py                      # report/report.pdf (needs tectonic); prints the page where the main text ends
+python3 report/build_docx.py                     # report/report.docx (needs python-docx)
 ```
 
 The CLI path can be set with `CLAUDE_BIN`; otherwise `~/.local/bin/claude`, then `claude` on PATH.

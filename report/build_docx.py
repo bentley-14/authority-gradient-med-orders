@@ -1,8 +1,7 @@
-"""Builds report/apart_submission.docx from report/apart_submission.md, laid out like
-the Apart Research submission template (Old Standard TT, title block, authors, abstract
-box, numbered sections). Handles only the Markdown this report uses: headings, paragraphs
+"""Builds report/report.docx from report/report.md (Old Standard TT, title block, authors,
+abstract box, numbered sections). Handles only the Markdown this report uses: headings, paragraphs
 with **bold** / *italic* / `code`, numbered and bulleted lists, pipe tables, and images.
-The PDF for submission is built separately by report/build_pdf.py from the same Markdown.
+The PDF is built separately by report/build_pdf.py from the same Markdown.
 
 Usage: python3 report/build_docx.py   (needs python-docx)
 """
@@ -17,9 +16,8 @@ from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC, OUT = os.path.join(HERE, "apart_submission.md"), os.path.join(HERE, "apart_submission.docx")
+SRC, OUT = os.path.join(HERE, "report.md"), os.path.join(HERE, "report.docx")
 FONT = "Old Standard TT"
-FOOTNOTE = "Research conducted at the AI x Epistemics Research Sprint, November 2026"
 
 
 def runs(par, text, size=None, italic_all=False):
@@ -74,12 +72,6 @@ def main():
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     runs(p, "    ".join(a for a in authors if not a.startswith("With")), size=10.5)
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    runs(p, "**With** Apart Research", size=11)
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    runs(p, FOOTNOTE, size=8.5, italic_all=True)
     # Abstract box
     abstract = lines[6].strip()
     t = doc.add_table(rows=1, cols=1)

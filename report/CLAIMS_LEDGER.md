@@ -1,8 +1,8 @@
 # Claims ledger
 
-Every number in report/apart_submission.md (the submission; built to apart_submission.pdf and .docx) -> where it comes from. The tables below were first written against the earlier report_draft.md (now in report/working_notes/); see "Report restructure (Nov 15)" at the end for how its table and figure numbers map to the submission. Repo = bentley-14/authority-gradient-med-orders (Shilp). All repo work was produced during the sprint (Nov 13 to 15, 2026) per its README. "Extra" = src/part1_extra_stats.py run on Stage B results.csv (Nov 15; rerun and matched by the main session).
+Every number in report/report.md (built to report.pdf and report.docx) -> where it comes from. The tables below were first written against an earlier working draft (report_draft.md, in the git history); see "Report restructure (Nov 15)" at the end for how its table and figure numbers map to the report. Repo = bentley-14/authority-gradient-med-orders (Shilp). All repo work was produced between Nov 13 and 15, 2026 per its README. "Extra" = src/part1_extra_stats.py run on Stage B results.csv (Nov 15; rerun and matched by the main session).
 
-| Claim | Value | Source file (script) | Commit | During sprint | Status |
+| Claim | Value | Source file (script) | Commit | Nov 13 to 15 | Status |
 |---|---|---|---|---|---|
 | Entered at first request | 0 of 1,350 | data/outputs/confirmatory/analysis.md (src/analyze_confirmatory.py) | 16f15a4 | yes | confirmed |
 | Entered at changed dose | 0 of 1,350 | same | 16f15a4 | yes | confirmed |
@@ -43,7 +43,7 @@ Every number in report/apart_submission.md (the submission; built to apart_submi
 
 ## Experiment C (branch exp-c of Shilp's repo; results commit 475a6c8; pre-registration 28f71a8; analysis script fcef957)
 
-| Claim | Value | Source file (script) | Commit | During sprint | Status |
+| Claim | Value | Source file (script) | Commit | Nov 13 to 15 | Status |
 |---|---|---|---|---|---|
 | Conversations completed / failed | 1,980 / 0 | data/outputs/exp_c/analysis.md (src/analyze_exp_c.py) | 475a6c8 | yes | confirmed |
 | Ledger matches stream | 1,980 of 1,980 | analysis.md | 475a6c8 | yes | confirmed |
@@ -62,12 +62,12 @@ Every number in report/apart_submission.md (the submission; built to apart_submi
 | Email copied into order note | 35 of 1,980 | results.csv before redaction (main session count) | 475a6c8 | yes | confirmed |
 | CEO quote "your confirmation doesn't replace a prescriber's" | metformin_2x_ceo_bare_r4 | exp_c/results.csv turn2_response | 475a6c8 | yes | confirmed |
 | Irrelevant quotes "isn't a clinical reason for a dose this high", "No indication I know of supports this dose" | ibuprofen_2x_no_title_irrelevant_r24, _r17 | exp_c/results.csv turn2_response | 475a6c8 | yes | confirmed (the earlier draft paraphrased r24 as "not a clinical reason..." inside quote marks; the submission now quotes it verbatim) |
-| Relevant quote "should help nursing and pharmacy verification go smoothly" | sertraline_5x_attending_relevant_r26 | exp_c/results.csv turn2_response | 475a6c8 | yes | confirmed; the sentence refers to the order note that records the protocol ("That should help..."), so the submission now says the model remarks that noting the protocol on the order should help |
+| Relevant quote "should help nursing and pharmacy verification go smoothly" | sertraline_5x_attending_relevant_r26 | exp_c/results.csv turn2_response | 475a6c8 | yes | confirmed; the sentence refers to the order note that records the protocol ("That should help..."), so the report now says the model remarks that noting the protocol on the order should help |
 | Logistic regressions | not reported (separation) | analysis.md | 475a6c8 | yes | per plan |
 
 ## Model addendum (results commit ddd50d0; pre-registration d24ec09)
 
-| Claim | Value | Source file (script) | Commit | During sprint | Status |
+| Claim | Value | Source file (script) | Commit | Nov 13 to 15 | Status |
 |---|---|---|---|---|---|
 | Conversations / failures / model match | 720 / 0 / 720 of 720 | data/outputs/exp_c_models/analysis.md (src/analyze_exp_c_models.py) | ddd50d0 | yes | confirmed |
 | Table 4 rates and CIs | see Table 4 | analysis.md entry-rate table | ddd50d0 | yes | confirmed |
@@ -83,7 +83,7 @@ Every number in report/apart_submission.md (the submission; built to apart_submi
 
 ## Experiment D (main branch; pre-registration, driver and analysis script 23cdd20; results commit 358178a)
 
-| Claim | Value | Source file (script) | Commit | During sprint | Status |
+| Claim | Value | Source file (script) | Commit | Nov 13 to 15 | Status |
 |---|---|---|---|---|---|
 | Conversations completed / failed | 1,080 / 0 (900 over-limit, 180 at the label maximum) | data/outputs/exp_d/analysis.md (src/analyze_exp_d.py) | 358178a | yes | confirmed |
 | Ledger matches stream | 1,080 of 1,080 | analysis.md | 358178a | yes | confirmed |
@@ -109,7 +109,7 @@ Every number in report/apart_submission.md (the submission; built to apart_submi
 
 ## Report restructure (Nov 15, evening)
 
-apart_submission.md was reorganized into a ladder (Introduction, Related Work, General Methodology, Stage B as a replication of prior work, Experiment C, model addendum, Experiment D, Discussion, Conclusion). No finding was dropped; detail moved to the appendices. Numbering in the submission:
+report.md was reorganized into a ladder (Introduction, Related Work, General Methodology, Stage B as a replication of prior work, Experiment C, model addendum, Experiment D, Discussion, Conclusion). No finding was dropped; detail moved to the appendices. Numbering in the report:
 
 | Submission item | Content | Earlier name |
 |---|---|---|
@@ -119,14 +119,14 @@ apart_submission.md was reorganized into a ladder (Introduction, Related Work, G
 | Figure 4 | Entry by who is asking, three models (exp_c/figures/fig1_who_is_asking.png) | Figure 2 |
 | Figure 5 | Experiment D (exp_d/figures/fig1_message_by_system_prompt.png) | Figure 4 |
 | Table B1 | Stage B entry by title and dose with Wilson CIs | Table B1 (draft Table 1) |
-| Table B2 | Stage B secondary: each title vs no title, half-entry dose | new in the submission |
+| Table B2 | Stage B secondary: each title vs no title, half-entry dose | new in the report |
 | Table B3 | Experiment C, every condition | Table 1 (draft Table 3) |
 | Table B4 | Model addendum | Table B2 (draft Table 4) |
 | Table B5 | Experiment D | Table B3 |
 
 New or moved claims:
 
-| Claim | Value | Source file (script) | Commit | During sprint | Status |
+| Claim | Value | Source file (script) | Commit | Nov 13 to 15 | Status |
 |---|---|---|---|---|---|
 | Table B2 entered counts | 82, 19, 66, 96, 105, 95 of 225 | confirmatory/analysis.md secondary per-title table; recounted from results.csv | 16f15a4 | yes | confirmed |
 | Table B2 per-title OR (95% CI), Holm p | resident 0.20 (0.07 to 0.53), 0.0041; attending 3.36 (1.40 to 8.07), 0.0182; senior attending 6.85 (2.68 to 17.48), < 0.0001; department chair 3.50 (1.39 to 8.83), 0.0182; medical student not estimable, < 0.0001 | confirmatory/analysis.md secondary per-title table | 16f15a4 | yes | confirmed (secondary) |
@@ -135,5 +135,5 @@ New or moved claims:
 | Strata selection: sertraline 3x untitled at ceiling | 15 of 15 | confirmatory/results.csv | 16f15a4 | yes | confirmed (recounted) |
 | Sertraline 3x pooled Stage B rate (upper edge of the 20% to 80% band) | 72 of 90 (80%) | confirmatory/analysis.md entry rate by drug | 16f15a4 | yes | confirmed |
 
-Independent recount (Nov 15, evening): a fresh script read the four results.csv files directly and reproduced every headline count in the submission (5,130 conversations; 0 entered at the first request among the 4,950 over-limit orders; Stage B 463/1,350 and each title's count; Experiment C bare-confirmation and second-message counts, including 358/360, 1/360, 224/360, 113/360 and sertraline 88/90; addendum 25/74/0 of 120 on Opus and 82/103/0 of 120 on Haiku; CEO 0/420; every Experiment D cell; 180/180 label-maximum orders entered at the first request), and recomputed the Mantel-Haenszel odds ratios and CIs for H2 (4.32, 2.03 to 9.17), H6 (0.00, 0.00 to 0.03), responsibility vs bare (5.41, 3.72 to 7.86), H7 Opus (9.35, 4.67 to 18.73), H7 Haiku (4.64, 2.05 to 10.50, 3 strata), Sonnet attending vs no title (2.93, 1.74 to 4.94), H9 (22.15, 7.36 to 66.69) and H11 (0.00, 0.00 to 0.01) with statsmodels. All matched the analysis files. The redaction count of the account email in committed results ([REDACTED_EMAIL] in tool calls: 2, 35, 11, 1) matches Appendix A.
+Independent recount (Nov 15, evening): a fresh script read the four results.csv files directly and reproduced every headline count in the report (5,130 conversations; 0 entered at the first request among the 4,950 over-limit orders; Stage B 463/1,350 and each title's count; Experiment C bare-confirmation and second-message counts, including 358/360, 1/360, 224/360, 113/360 and sertraline 88/90; addendum 25/74/0 of 120 on Opus and 82/103/0 of 120 on Haiku; CEO 0/420; every Experiment D cell; 180/180 label-maximum orders entered at the first request), and recomputed the Mantel-Haenszel odds ratios and CIs for H2 (4.32, 2.03 to 9.17), H6 (0.00, 0.00 to 0.03), responsibility vs bare (5.41, 3.72 to 7.86), H7 Opus (9.35, 4.67 to 18.73), H7 Haiku (4.64, 2.05 to 10.50, 3 strata), Sonnet attending vs no title (2.93, 1.74 to 4.94), H9 (22.15, 7.36 to 66.69) and H11 (0.00, 0.00 to 0.01) with statsmodels. All matched the analysis files. The redaction count of the account email in committed results ([REDACTED_EMAIL] in tool calls: 2, 35, 11, 1) matches Appendix A.
 
