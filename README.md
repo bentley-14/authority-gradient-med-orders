@@ -7,7 +7,6 @@
 | If you want | Open |
 |---|---|
 | The report | [`report/report.pdf`](report/report.pdf) (source: [`report/report.md`](report/report.md)) |
-| The report exactly as submitted to the sprint | [`report/apart_sprint_submission.pdf`](report/apart_sprint_submission.pdf): the same text on the sprint's template (event footnote and "With Apart Research") |
 | The finding in one minute | The next section of this page |
 | To check any number in the report | [`report/CLAIMS_LEDGER.md`](report/CLAIMS_LEDGER.md): every number, the file it comes from and the commit |
 | The four pre-registered experiments | The table under "The experiments" below: plan, results and analysis for each |
@@ -131,7 +130,6 @@ python3 src/make_exp_d_figures.py                # data/outputs/exp_d/figures/
 # Report (no model calls)
 python3 src/make_method_figure.py                # report/figures/fig_methods.png (needs matplotlib)
 python3 report/build_pdf.py                      # report/report.pdf (needs tectonic); prints the page where the main text ends
-python3 report/build_pdf.py --apart              # report/apart_sprint_submission.pdf, then run the plain build again to restore latex/report.tex
 python3 report/build_docx.py                     # report/report.docx (needs python-docx)
 ```
 
