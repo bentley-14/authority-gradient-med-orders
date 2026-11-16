@@ -10,6 +10,8 @@ It also prints the page on which the main text ends (the end of the Conclusion; 
 from the main text are forced out before that point) and the total page count.
 
 Usage: python3 report/build_pdf.py   (needs tectonic on PATH or at /opt/homebrew/bin)
+       python3 report/build_pdf.py --apart   (the sprint-template variant, report/apart_submission.pdf)
+       (--apart also rewrites report/latex/report.tex; run the plain build afterwards to restore it)
 """
 import os
 import re
@@ -23,6 +25,10 @@ TEXDIR = os.path.join(HERE, "latex")
 TEX = os.path.join(TEXDIR, "report.tex")
 PDF = os.path.join(HERE, "report.pdf")
 MAIN_END_BEFORE = "Code and Data"  # first heading after the main text
+APART = "--apart" in sys.argv  # sprint-template variant, written to report/apart_submission.pdf (not committed)
+FOOTNOTE = "Research conducted at the AI x Epistemics Research Sprint, November 2026"
+if APART:
+    PDF = os.path.join(HERE, "apart_submission.pdf")
 
 PREAMBLE = r"""\documentclass[11pt]{article}
 \usepackage[letterpaper,margin=1in]{geometry}
@@ -143,12 +149,16 @@ def convert(md):
     authors = [a.strip() for a in lines[2].split("|") if not a.strip().startswith("With")]
     abstract = lines[6].strip()
     out = [PREAMBLE]
-    out.append(r"\begin{center}{\fontsize{20}{24}\selectfont\bfseries %s\par}" % inline(title))
+    # --apart adds the event footnote and the "With Apart Research" block of the sprint's template.
+    note = r"\footnote{%s}" % esc(FOOTNOTE) if APART else ""
+    out.append(r"\begin{center}{\fontsize{20}{24}\selectfont\bfseries %s%s\par}" % (inline(title), note))
     out.append(r"\vspace{10pt}")
     cells = []
     for a in authors:
         name, _, aff = a.partition(",")
         cells.append(r"\begin{tabular}[t]{c}%s\\{}%s\end{tabular}" % (inline(name.strip()), inline(aff.strip())))
+    if APART:
+        cells.append(r"\begin{tabular}[t]{c}\textbf{With}\\Apart Research\end{tabular}")
     out.append(r"\hspace{2em}".join(cells))
     out.append(r"\end{center}")
     out.append(r"\vspace{2pt}\begin{center}{\fontsize{14}{17}\selectfont\bfseries Abstract}\end{center}\vspace{-6pt}")

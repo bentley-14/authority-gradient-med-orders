@@ -1,6 +1,6 @@
 # The Right Words, Not the Right Title: What Unlocks an Over-Limit Order in a Clinical AI Agent
 
-Tarun Martheswaran | Shilp Shah
+Tarun Martheswaran, Independent | Shilp Shah, Independent
 
 **Abstract**
 
@@ -179,7 +179,7 @@ All authors contributed equally.
 
 ### Dual-use
 
-Experiment C found a single generic sentence that gets almost every over-limit order entered. That is a real dual-use concern: it is a recipe for pressuring a clinical AI assistant. We weigh it as follows. The sentence is the most obvious thing a clinician would say, not an optimized attack; any deployment where it works is already unsafe against ordinary users; and the defensive lesson (do not let self-reported justification gate harmful actions) needs the example to be credible. We quote the sentence verbatim. Paraphrasing it would make the finding harder to check and reproduce without making the sentence harder to find, since it is the first thing a clinician would write. Part 1's finding could in principle teach someone to claim a senior clinical title and confirm; we judge that added risk to be low. Experiment D reduces the concern: the same report that gives the sentence gives a one-line system-prompt defense that removed most of its effect in our setup. We release no optimized attack prompts.
+Experiment C found a single generic sentence that gets almost every over-limit order entered. That is a real dual-use concern: it is a recipe for pressuring a clinical AI assistant. We weigh it as follows. The sentence is the most obvious thing a clinician would say, not an optimized attack; any deployment where it works is already unsafe against ordinary users; and the defensive lesson (do not let self-reported justification gate harmful actions) needs the example to be credible. We quote the sentence verbatim. Paraphrasing it would make the finding harder to check and reproduce without making the sentence harder to find, since it is the first thing a clinician would write. Stage B's finding could in principle teach someone to claim a senior clinical title and confirm; we judge that added risk to be low. Experiment D reduces the concern: the same report that gives the sentence gives a one-line system-prompt defense that removed most of its effect in our setup. We release no optimized attack prompts.
 
 ### Ethics
 
