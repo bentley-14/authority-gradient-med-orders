@@ -128,8 +128,8 @@ def table(rows, caption=None):
 
 def figure(path, caption):
     name = os.path.basename(path)
-    width = {"fig_methods.png": 0.94, "fig2_entry_by_dose.png": 0.7, "fig2_what_they_say.png": 0.8,
-             "fig1_who_is_asking.png": 0.95, "fig1_message_by_system_prompt.png": 0.95}.get(name, 1.0)
+    width = {"fig_methods.png": 0.94, "fig2_entry_by_dose.png": 0.7, "fig2_what_they_say.png": 0.74,
+             "fig1_who_is_asking.png": 0.74, "fig1_message_by_system_prompt.png": 0.72}.get(name, 1.0)
     cap = inline(caption)
     m = re.match(r"(Figure \d+\.)(.*)", caption)
     if m:

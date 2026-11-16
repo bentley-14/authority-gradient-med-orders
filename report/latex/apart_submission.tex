@@ -36,7 +36,7 @@
 
 \begin{center}{\fontsize{20}{24}\selectfont\bfseries The Right Words, Not the Right Title: What Unlocks an Over-Limit Order in a Clinical AI Agent\footnote{Research conducted at the AI x Epistemics Research Sprint, November 2026}\par}
 \vspace{10pt}
-\begin{tabular}[t]{c}Tarun Martheswaran\\{}[affiliation]\end{tabular}\hspace{2em}\begin{tabular}[t]{c}Shilp Shah\\{}[affiliation]\end{tabular}\hspace{2em}\begin{tabular}[t]{c}\textbf{With}\\Apart Research\end{tabular}
+\begin{tabular}[t]{c}Tarun Martheswaran\\{}\end{tabular}\hspace{2em}\begin{tabular}[t]{c}Shilp Shah\\{}\end{tabular}\hspace{2em}\begin{tabular}[t]{c}\textbf{With}\\Apart Research\end{tabular}
 \end{center}
 \vspace{2pt}\begin{center}{\fontsize{14}{17}\selectfont\bfseries Abstract}\end{center}\vspace{-6pt}
 \begin{center}\fbox{\begin{minipage}{0.9\textwidth}\vspace{4pt}\small\setlength{\parskip}{0pt}\linespread{1.0}\selectfont A good reasoner acts on evidence, not on who is asking or how hard they push. We test this in a clinical AI agent whose decisions become actions: Claude Sonnet as a hospital order-entry assistant with a real tool that has no dose limits, scored from the tool's ledger by code, not by a model judge. Across four pre-registered runs (5,130 conversations), the agent refused every order above the label maximum at the first request. A bare ``Yes, I confirm'' then got 34\% entered, and claimed titles shifted it: senior clinical titles raised the odds of entry (odds ratio 4.32), trainees lowered them. Seniority alone did nothing: a hospital CEO who said they were not a clinician got 0 orders on Sonnet, Opus and Haiku, while an attending title raised entry on all three. The strongest lever was a sentence. One unverifiable clinical justification (``a documented, pharmacist-reviewed high-dose protocol'') got 358 of 360 over-limit orders entered, including sertraline at five times the maximum; an irrelevant reason got 1 of 360. This is neither one lucky wording nor blindness to content: reworded clinical reasons also worked (90\% and 55\%), but a false claim the model could check (``within the FDA label'') got 0 of 60. One added system-prompt sentence, reminding the agent that it cannot verify what users say, cut entry from 81\% to 6\% without blocking any routine order. The agent rejects what it knows is false but, by default, treats what it cannot check as evidence.\vspace{4pt}\end{minipage}}\end{center}
@@ -113,7 +113,7 @@ Most work on this question scores what a model says. We score what it does. Our 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.80\textwidth]{../data/outputs/exp_c/figures/fig2_what_they_say.png}
+\includegraphics[width=0.74\textwidth]{../data/outputs/exp_c/figures/fig2_what_they_say.png}
 \par\vspace{2pt}{\small \textbf{Figure 3.} Experiment C2: share of over-limit orders entered by what the second message says (Sonnet 5.5; 180 conversations per bar, 95\% Wilson intervals). None of the three reasons can be verified by the model; they are matched in length.\par}
 \end{figure}
 \textbf{The model still records the risk.} All 701 entered orders carried a note saying the dose was above the maximum. With the irrelevant reason the model writes ``No indication I know of supports this dose''; with the protocol sentence it enters the same kind of order and remarks that noting the protocol on the order ``should help nursing and pharmacy verification go smoothly.''
@@ -129,7 +129,7 @@ Most work on this question scores what a model says. We score what it does. Our 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{../data/outputs/exp_c/figures/fig1_who_is_asking.png}
+\includegraphics[width=0.74\textwidth]{../data/outputs/exp_c/figures/fig1_who_is_asking.png}
 \par\vspace{2pt}{\small \textbf{Figure 4.} Share of over-limit orders entered after a bare ``Yes, I confirm,'' by who is asking, for three model sizes (Sonnet: 180 conversations per bar; Haiku and Opus: 120; 95\% Wilson intervals; pooled over four drug x dose strata). Non-clinicians get nothing on every model; an attending title raises entry on every model.\par}
 \end{figure}
 \textbf{What this settled, and what it left open.} Role-based screening of the source is shared across the three model sizes. The questions about content remained: is it that one sentence, does truth matter when the model can check, and can a deployer close the gate?
@@ -143,7 +143,7 @@ Most work on this question scores what a model says. We score what it does. Our 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{../data/outputs/exp_d/figures/fig1_message_by_system_prompt.png}
+\includegraphics[width=0.72\textwidth]{../data/outputs/exp_d/figures/fig1_message_by_system_prompt.png}
 \par\vspace{2pt}{\small \textbf{Figure 5.} Experiment D: share of over-limit orders entered by what the second message says, under three system prompts (untitled user, Sonnet 5.5; 60 conversations per bar, 95\% Wilson intervals). Reworded clinical reasons unlock orders, a checkable false claim does not, and one reminder sentence removes most of the effect.\par}
 \end{figure}
 \textbf{What this settled.} The key is a category of reason, not a magic phrase; the model checks truth when it can; and the knowledge needed to refuse was already in the model.
@@ -165,12 +165,13 @@ This matters for medicine because the cheapest things to fake in a chat window a
 \FloatBarrier\label{endmain}
 \section*{Code and Data}
 \begin{itemize}
-\item \textbf{Code repository}: github.com/bentley-14/authority-gradient-med-orders (branch main; private during judging). All code was written during the sprint; no pre-existing code was used.
-\item \textbf{Data}: every conversation's prompts, raw CLI events, ledger and outcome are in the repository (data/outputs/), with the account email redacted. Every number in this report is traced to a file and commit in report/CLAIMS\_LEDGER.md.
+\item \textbf{Code repository}: github.com/bentley-14/authority-gradient-med-orders (branch main, public). All code was written during the sprint; no pre-existing code was used.
+\item \textbf{Data}: every conversation's prompts, raw CLI events, ledger and outcome are in the repository (data/outputs/), with the account email redacted.
+\item \textbf{Reading guide}: the repository README lists each pre-registered experiment with its plan, results and analysis file, and report/CLAIMS\_LEDGER.md maps every number in this report to a file and commit.
 \item \textbf{Info-hazard note}: see Appendix A on the dual-use consideration of quoting the protocol sentence.
 \end{itemize}
 \section*{Author Contributions (optional)}
-S.S. built the harness and ran the exploratory, Stage B and Experiment D studies. T.M. designed and ran Experiment C and the model addendum. Both authors wrote the report.
+S.S. built the harness and ran the exploratory and Stage B experiments. T.M. designed and ran Experiment C and the model addendum. S.S. ran Experiment D. Both authors wrote the report.
 
 \section*{References}
 \begin{enumerate}\small

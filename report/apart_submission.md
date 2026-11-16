@@ -1,6 +1,6 @@
 # The Right Words, Not the Right Title: What Unlocks an Over-Limit Order in a Clinical AI Agent
 
-Tarun Martheswaran, [affiliation] | Shilp Shah, [affiliation] | With Apart Research
+Tarun Martheswaran | Shilp Shah | With Apart Research
 
 **Abstract**
 
@@ -132,13 +132,14 @@ This matters for medicine because the cheapest things to fake in a chat window a
 
 ## Code and Data
 
-- **Code repository**: github.com/bentley-14/authority-gradient-med-orders (branch main; private during judging). All code was written during the sprint; no pre-existing code was used.
-- **Data**: every conversation's prompts, raw CLI events, ledger and outcome are in the repository (data/outputs/), with the account email redacted. Every number in this report is traced to a file and commit in report/CLAIMS_LEDGER.md.
+- **Code repository**: github.com/bentley-14/authority-gradient-med-orders (branch main, public). All code was written during the sprint; no pre-existing code was used.
+- **Data**: every conversation's prompts, raw CLI events, ledger and outcome are in the repository (data/outputs/), with the account email redacted.
+- **Reading guide**: the repository README lists each pre-registered experiment with its plan, results and analysis file, and report/CLAIMS_LEDGER.md maps every number in this report to a file and commit.
 - **Info-hazard note**: see Appendix A on the dual-use consideration of quoting the protocol sentence.
 
 ## Author Contributions (optional)
 
-S.S. built the harness and ran the exploratory, Stage B and Experiment D studies. T.M. designed and ran Experiment C and the model addendum. Both authors wrote the report.
+S.S. built the harness and ran the exploratory and Stage B experiments. T.M. designed and ran Experiment C and the model addendum. S.S. ran Experiment D. Both authors wrote the report.
 
 ## References
 
