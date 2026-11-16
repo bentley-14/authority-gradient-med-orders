@@ -155,7 +155,7 @@ All authors contributed equally.
 10. Laban, P., et al. (2023). Are You Sure? Challenging LLMs Leads to Performance Drops in The FlipFlop Experiment. arXiv:2311.08596.
 11. Mammen, Joswin, & Venkitachalam (2026). Who Endorsed It? Measuring Authority Bias Across Expertise Levels in Language Models. arXiv:2601.13433.
 12. Maraia, G., Zanzotto, F. M., & Ranaldi, L. (2026). Sounding vs. Being an Expert: Disentangling Authority, Register and Cultural Impact in Sycophantic LLMs. Findings of ACL 2026. doi:10.18653/v1/2026.findings-acl.1627
-13. Peng, et al. (2026). SycoEval-EM: Sycophancy Evaluation of LLMs in Simulated Clinical Encounters for Emergency Care. arXiv:2601.16529.
+13. Peng, et al. (2026). SycoEval-EM: Sycophancy Evaluation of Large Language Models in Simulated Clinical Encounters for Emergency Care. arXiv:2601.16529.
 14. Ren, R., et al. (2025). The MASK Benchmark: Disentangling Honesty From Accuracy in AI Systems. arXiv:2503.03750.
 15. Sharma, M., et al. (2023). Towards Understanding Sycophancy in Language Models. arXiv:2310.13548.
 16. Sperber, D., Clément, F., Heintz, C., Mascaro, O., Mercier, H., Origgi, G., & Wilson, D. (2010). Epistemic Vigilance. Mind & Language 25(4):359-393. doi:10.1111/j.1468-0017.2010.01394.x

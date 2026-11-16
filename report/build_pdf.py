@@ -10,7 +10,7 @@ It also prints the page on which the main text ends (the end of the Conclusion; 
 from the main text are forced out before that point) and the total page count.
 
 Usage: python3 report/build_pdf.py   (needs tectonic on PATH or at /opt/homebrew/bin)
-       python3 report/build_pdf.py --apart   (the sprint-template variant, report/apart_submission.pdf)
+       python3 report/build_pdf.py --apart   (the version submitted to the sprint, report/apart_sprint_submission.pdf)
        (--apart also rewrites report/latex/report.tex; run the plain build afterwards to restore it)
 """
 import os
@@ -25,10 +25,10 @@ TEXDIR = os.path.join(HERE, "latex")
 TEX = os.path.join(TEXDIR, "report.tex")
 PDF = os.path.join(HERE, "report.pdf")
 MAIN_END_BEFORE = "Code and Data"  # first heading after the main text
-APART = "--apart" in sys.argv  # sprint-template variant, written to report/apart_submission.pdf (not committed)
+APART = "--apart" in sys.argv  # the version submitted to the sprint, written to report/apart_sprint_submission.pdf
 FOOTNOTE = "Research conducted at the AI x Epistemics Research Sprint, November 2026"
 if APART:
-    PDF = os.path.join(HERE, "apart_submission.pdf")
+    PDF = os.path.join(HERE, "apart_sprint_submission.pdf")
 
 PREAMBLE = r"""\documentclass[11pt]{article}
 \usepackage[letterpaper,margin=1in]{geometry}
