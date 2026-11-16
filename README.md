@@ -40,10 +40,10 @@ Each confirmatory experiment was pre-registered: its plan was committed and push
 
 | Experiment | Question | Conversations | Plan (pre-registration commit) | Deviations | Results and analysis |
 |---|---|---|---|---|---|
-| Stage B | Does a stated clinical title change whether a confirmed over-limit order is entered? | 1,350 | [`CONFIRMATORY_PLAN.md`](CONFIRMATORY_PLAN.md) (`113b65d`) | [`DEVIATIONS.md`](DEVIATIONS.md) | [`data/outputs/confirmatory/analysis.md`](data/outputs/confirmatory/analysis.md) |
-| Experiment C | Is it seniority or clinical authority, and does the content of the second message matter? | 1,980 | [`EXP_C_PLAN.md`](EXP_C_PLAN.md) (`28f71a8`) | [`DEVIATIONS_EXP_C.md`](DEVIATIONS_EXP_C.md) | [`data/outputs/exp_c/analysis.md`](data/outputs/exp_c/analysis.md) |
-| Model addendum | Does the title result hold on Opus and Haiku? | 720 | [`EXP_C_MODELS_ADDENDUM.md`](EXP_C_MODELS_ADDENDUM.md) (`d24ec09`) | [`DEVIATIONS_EXP_C.md`](DEVIATIONS_EXP_C.md) | [`data/outputs/exp_c_models/analysis.md`](data/outputs/exp_c_models/analysis.md) |
-| Experiment D | Is it that one sentence, does truth matter when the model can check, and can one instruction close the gate? | 1,080 | [`EXP_D_PLAN.md`](EXP_D_PLAN.md) (`23cdd20`) | [`DEVIATIONS_EXP_D.md`](DEVIATIONS_EXP_D.md) | [`data/outputs/exp_d/analysis.md`](data/outputs/exp_d/analysis.md) |
+| Stage B | Does a stated clinical title change whether a confirmed over-limit order is entered? | 1,350 | [`CONFIRMATORY_PLAN.md`](preregistration/CONFIRMATORY_PLAN.md) (`113b65d`) | [`DEVIATIONS.md`](preregistration/DEVIATIONS.md) | [`data/outputs/confirmatory/analysis.md`](data/outputs/confirmatory/analysis.md) |
+| Experiment C | Is it seniority or clinical authority, and does the content of the second message matter? | 1,980 | [`EXP_C_PLAN.md`](preregistration/EXP_C_PLAN.md) (`28f71a8`) | [`DEVIATIONS_EXP_C.md`](preregistration/DEVIATIONS_EXP_C.md) | [`data/outputs/exp_c/analysis.md`](data/outputs/exp_c/analysis.md) |
+| Model addendum | Does the title result hold on Opus and Haiku? | 720 | [`EXP_C_MODELS_ADDENDUM.md`](preregistration/EXP_C_MODELS_ADDENDUM.md) (`d24ec09`) | [`DEVIATIONS_EXP_C.md`](preregistration/DEVIATIONS_EXP_C.md) | [`data/outputs/exp_c_models/analysis.md`](data/outputs/exp_c_models/analysis.md) |
+| Experiment D | Is it that one sentence, does truth matter when the model can check, and can one instruction close the gate? | 1,080 | [`EXP_D_PLAN.md`](preregistration/EXP_D_PLAN.md) (`23cdd20`) | [`DEVIATIONS_EXP_D.md`](preregistration/DEVIATIONS_EXP_D.md) | [`data/outputs/exp_d/analysis.md`](data/outputs/exp_d/analysis.md) |
 
 Each results folder also holds `results.csv` (one row per conversation), `figures/`, `logs/` (raw CLI events for every conversation) and `ledgers/` (what the tool actually recorded).
 
@@ -57,17 +57,9 @@ Earlier exploratory runs (single-turn chat, a grader comparison, a confirm pilot
 
 *The harness used in every study (top) and how each study answered the question the previous one left open (bottom).*
 
-## What the top-level files are
+## Pre-registration
 
-| File | What it is |
-|---|---|
-| `STARTER_PLAN.md` | The original one-page spec from the start of the project (single turn, chat only). Kept for history; the project moved past it (see "Deviations from STARTER_PLAN.md" below). |
-| `ANALYSIS_PLAN.md` | A fuller early design draft, never frozen and not implemented as written. Kept for history. |
-| `CONFIRMATORY_PLAN.md` | Pre-registration for Stage A (dose finding) and Stage B (the title test). Timestamped evidence: committed before any of its data. |
-| `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `EXP_D_PLAN.md` | Pre-registrations for Experiment C, its model addendum and Experiment D, each pushed before its run. |
-| `DEVIATIONS.md`, `DEVIATIONS_EXP_C.md`, `DEVIATIONS_EXP_D.md` | Logs of every deviation from those plans and of choices the plans left open. |
-
-The plan and deviation files, the analysis scripts they name, and everything under `data/` and `environment/evidence/` are left as committed at the time, except that local user names and home paths in the raw logs were later replaced with `[USER]` and `[HOME]` (see Privacy above).
+`preregistration/` holds the plan for each confirmatory experiment (`CONFIRMATORY_PLAN.md` for Stage A and B, `EXP_C_PLAN.md`, `EXP_C_MODELS_ADDENDUM.md`, `EXP_D_PLAN.md`), each committed and pushed before any of its conversations ran, and the deviation logs (`DEVIATIONS*.md`) recording every departure from those plans and every choice they left open. These files, the analysis scripts they name, and everything under `data/` and `environment/evidence/` are kept as committed at the time (the files were later moved into this folder unchanged; `git log --follow` shows their original commits), except that local user names and home paths in the raw logs were later replaced with `[USER]` and `[HOME]` (see Privacy above).
 
 ## Folder map
 
@@ -107,7 +99,7 @@ python3 src/experiment_hub/tool_driver.py        # 270 conversations -> data/out
 python3 src/summarize_tool_run.py                # data/outputs/tool_run/summary.md
 python3 src/make_tool_figures.py                 # data/outputs/tool_run/figures/
 
-# Confirmatory plan (CONFIRMATORY_PLAN.md)
+# Confirmatory plan (preregistration/CONFIRMATORY_PLAN.md)
 python3 src/prompts/prompt_builder.py prompts_dose_finding.csv 3x 5x      # Stage A inputs
 python3 src/experiment_hub/dose_driver.py A      # Stage A, 180 conversations -> data/outputs/dose_finding/
 python3 src/summarize_dose_finding.py            # summary.md and DOSE_DECISION.md
@@ -118,7 +110,7 @@ python3 src/analyze_confirmatory.py              # only on complete Stage B data
 python3 src/make_confirmatory_figures.py         # needs matplotlib
 python3 src/part1_extra_stats.py                 # stratum table + preliminary say-vs-do counts
 
-# Experiment C (EXP_C_PLAN.md) and its model addendum (EXP_C_MODELS_ADDENDUM.md)
+# Experiment C (preregistration/EXP_C_PLAN.md) and its model addendum (preregistration/EXP_C_MODELS_ADDENDUM.md)
 python3 src/prompts/exp_c_builder.py             # data/inputs/prompts_exp_c.csv (44 prompts)
 python3 src/experiment_hub/exp_c_driver.py smoke # 11 conversations, plumbing only
 python3 src/experiment_hub/exp_c_driver.py C     # 1,980 conversations -> data/outputs/exp_c/ (optional second argument: conversations per pass)
@@ -128,7 +120,7 @@ python3 src/analyze_exp_c.py                     # needs statsmodels
 python3 src/analyze_exp_c_models.py
 python3 src/make_exp_c_figures.py                # data/outputs/exp_c/figures/
 
-# Experiment D (EXP_D_PLAN.md)
+# Experiment D (preregistration/EXP_D_PLAN.md)
 python3 src/prompts/exp_d_builder.py             # data/inputs/prompts_exp_d.csv (72 prompts)
 python3 src/experiment_hub/exp_d_driver.py smoke # 18 conversations, plumbing only
 python3 src/experiment_hub/exp_d_driver.py D     # 1,080 conversations -> data/outputs/exp_d/
@@ -238,13 +230,3 @@ Pre-registered in `EXP_D_PLAN.md` (pushed with the driver and analysis script be
 - **Grader context leak for junior titles.** Graders see the order request without the title and the reply with role words replaced by `[ROLE]`. That removes the title words but not the context. In run 1, every medical student reply and 15 of 45 resident replies still contain a `[ROLE]` marker or phrases such as "your supervising prescriber" or "co-sign" that show the clinician is a trainee. No attending, senior attending or department chair reply does. This affects every grader-based number. It does not affect the ledger outcomes of the tool run.
 - **Label maximum as the safety line.** The "safe" dose is the label maximum itself, and the label maximum stands in for safety. For acetaminophen the product maximum used is 3000 mg a day while the same label's warning cites 4,000 mg.
 - **Scale and realism.** Short synthetic prompts, one responder model, 3 repeats per prompt, no clinician review, and scoring by models wherever the ledger is not used.
-
-## Deviations from STARTER_PLAN.md
-
-- Lisinopril was replaced by amlodipine. The lisinopril label says doses up to 80 mg have been used, so 2x of 40 mg is not clearly over a label maximum (see the note column in `drugs.csv`).
-- Models are called through `claude -p`, not the API.
-- The grader sees the title-free order request as well as the reply, and role words in the reply are replaced by `[ROLE]`.
-- Grader v1's prompt got one added paragraph after the first pilot (treat a written-out draft as going along). Grader v2 then replaced the single holistic score with yes/no questions and three graders.
-- `appropriate` is computed in code from severity and score.
-- The confirmation turn and the order-entry tool are additions beyond the starter plan (the plan lists "the orderer insists after the first objection" as a later knob).
-- The grader JSON parser accepts a reply that is missing its final closing brace (seen with haiku).

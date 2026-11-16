@@ -23,10 +23,10 @@ Every number in report/report.md (built to report.pdf and report.docx) -> where 
 | Table 2 stratum counts (pooled, no title, senior, med student) | see Table 2 | confirmatory/results.csv (Extra) | 16f15a4 | yes | confirmed |
 | 10x entered after confirmation | 0 of 90 | data/outputs/tool_run/summary.md | 1d42d76 | yes | confirmed |
 | Stage A 3x / 5x | 28/90 (31%) / 18/90 (20%) | data/outputs/dose_finding/DOSE_DECISION.md | f5fd3d6 | yes | confirmed |
-| Pre-registration time | 08:46:56 EST Nov 14 | git log CONFIRMATORY_PLAN.md | 113b65d | yes | confirmed |
+| Pre-registration time | 08:46:56 EST Nov 14 | git log --follow preregistration/CONFIRMATORY_PLAN.md | 113b65d | yes | confirmed |
 | First Stage A ledger entry | 08:48:33 | dose_finding ledgers | f5fd3d6 | yes | confirmed |
-| Interim look | at 176 of 1,350 | DEVIATIONS.md | 16f15a4 | yes | confirmed |
-| Email in order notes | 2 of 1,350 | DEVIATIONS.md | 16f15a4 | yes | confirmed |
+| Interim look | at 176 of 1,350 | preregistration/DEVIATIONS.md | 16f15a4 | yes | confirmed |
+| Email in order notes | 2 of 1,350 | preregistration/DEVIATIONS.md | 16f15a4 | yes | confirmed |
 | Exploratory tool run size | 270 conversations | README.md | 5af083d | yes | confirmed |
 | Model / effort / CLI | claude-sonnet-5-5 / medium / 2.1.325 | analysis.md, environment/README.md | 16f15a4 | yes | confirmed |
 | Acetaminophen 3,000 vs 4,000 mg | label note | data/inputs/drugs.csv | 1b60886 | yes | confirmed |

@@ -44,7 +44,7 @@ Most work on this question scores what a model says. We score what it does. Our 
 
 **The ladder (Figure 1B).** Four pre-registered studies ran in sequence, each designed from the previous one's results. Every plan (and for Experiments C and D, the analysis script) was committed before any of its data existed.
 
-**Statistics.** Each conversation is one independent trial. Every test is a Cochran-Mantel-Haenszel test stratified by drug x dose (and by title or message where those are pooled), with a continuity-corrected p-value, the Mantel-Haenszel odds ratio and 95% CI, and Holm correction within each pre-registered family. Strata where everyone or no one entered drop out. All deviations are logged (DEVIATIONS.md, DEVIATIONS_EXP_C.md, DEVIATIONS_EXP_D.md); the main one is a disclosed interim look at Stage B dose and drug totals (not by title).
+**Statistics.** Each conversation is one independent trial. Every test is a Cochran-Mantel-Haenszel test stratified by drug x dose (and by title or message where those are pooled), with a continuity-corrected p-value, the Mantel-Haenszel odds ratio and 95% CI, and Holm correction within each pre-registered family. Strata where everyone or no one entered drop out. All deviations are logged (the repository's preregistration/ folder); the main one is a disclosed interim look at Stage B dose and drug totals (not by title).
 
 ![Figure 1](figures/fig_methods.png)
 
